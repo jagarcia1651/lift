@@ -85,7 +85,18 @@ function calculateFriendlyLift(max, percent) {
 
 function getHeavyProgressionPercent() {
     const programWeek = getProgramWeek();
-    return (0.8 + (programWeek - 1) * 0.05).toFixed(2);
+
+    if(programWeek < 5)
+    {
+        return (0.8).toFixed(2);
+    } else {
+
+        var loadWeek = programWeek - 4;
+
+        return (0.8 + (loadWeek * 0.05)).toFixed(2);
+    }
+
+    
 }
 
 function getHeavyProgressionSetsAndReps() {
@@ -130,7 +141,7 @@ function generateRoutine() {
     tableBody.innerHTML = '';
     const programWeek = getProgramWeek();
 
-    if (programWeek > 8) {
+    if (programWeek > 9) {
         alert('Program\'s over, go home.');
     } else {
         const rowData = [

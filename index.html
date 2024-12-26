@@ -9,7 +9,8 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
-    <main>
+    <header class="app-header">
+        <h1>Power Routine Calculator</h1>
         <div class="theme-switch" role="switch" aria-checked="false">
             <label class="switch" for="theme-toggle">
                 <input 
@@ -27,11 +28,10 @@
                 </span>
             </label>
         </div>
-        
+    </header>
+    <main>
         <!-- Setup View -->
         <div id="setup-view" class="view active">
-            <h1>Power Routine Calculator</h1>
-            
             <form class="input-container" onsubmit="event.preventDefault();">
                 <div class="input-group">
                     <label for="today-date">Today's Date</label>

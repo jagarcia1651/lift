@@ -81,10 +81,7 @@ h1 {
  * Theme Switch
  * ---------------------------- */
 .theme-switch {
-    position: absolute;
-    top: 2rem;
-    right: 2rem;
-    z-index: 10;
+    position: static;
 }
 
 .switch {
@@ -334,7 +331,7 @@ input:checked + .slider:before {
  * ---------------------------- */
 @media (max-width: 640px) {
     main {
-        padding: var(--header-height) 1rem 1rem;
+        padding: 1rem;
     }
 
     .theme-switch {
@@ -604,11 +601,11 @@ input:checked + .slider:before {
 /* Update workout view styles */
 .timer-container {
     position: sticky;
-    top: 0;
+    top: var(--header-height);
     z-index: 100;
     background: var(--background);
     padding: 1rem 0;
-    margin: -2rem -2rem 2rem;
+    margin: -1rem -2rem 2rem;
     border-bottom: 1px solid var(--border-color);
     display: flex;
     justify-content: center;
@@ -685,6 +682,8 @@ input:checked + .slider:before {
     border-radius: var(--border-radius);
     cursor: pointer;
     transition: var(--transition-speed);
+    scroll-snap-align: start;
+    scroll-margin-top: calc(var(--header-height) + 80px);
 }
 
 .exercise-row:hover {
@@ -789,5 +788,119 @@ input:checked + .slider:before {
     .set-mark .circle {
         width: 10px;
         height: 10px;
+    }
+}
+
+/* Update header styles */
+.app-header {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    z-index: 200;
+    background: var(--background);
+    padding: 1rem 2rem;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    backdrop-filter: blur(8px);
+    height: var(--header-height);
+    box-sizing: border-box;
+}
+
+.app-header h1 {
+    margin: 0;
+    font-size: 1.5rem;
+}
+
+/* Update theme switch position */
+.theme-switch {
+    position: static;  /* Remove absolute positioning */
+}
+
+/* Update main padding */
+main {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: var(--header-height) 2rem 2rem;
+    position: relative;
+}
+
+/* Mobile adjustments */
+@media (max-width: 640px) {
+    .app-header {
+        padding: 0.75rem 1rem;
+    }
+    
+    main {
+        padding: var(--header-height) 1rem 1rem;
+    }
+    
+    .timer-container {
+        margin: -1rem -1rem 1rem;
+        padding: 0.75rem 0;
+    }
+}
+
+/* Update timer container to account for header */
+.timer-container {
+    margin: 0 -2rem 2rem;  /* Remove negative top margin */
+}
+
+@media (max-width: 640px) {
+    .timer-container {
+        margin: 0 -1rem 1rem;
+    }
+}
+
+/* Add scroll snap container to workout content */
+.workout-content {
+    position: relative;
+    height: calc(100vh - var(--header-height) - 120px);
+    display: flex;
+    flex-direction: column;
+    margin: 0 -2rem;  /* Extend to edges */
+}
+
+.workout-progress {
+    flex: 1;
+    overflow-y: auto;
+    scroll-snap-type: y proximity;
+    padding: 1rem 2rem;
+    min-height: 0;  /* Allow content to shrink */
+}
+
+/* Update exercise rows */
+.exercise-row {
+    scroll-snap-align: start;
+    scroll-margin-top: calc(var(--header-height) + 80px);
+    margin-bottom: 1rem;
+}
+
+/* Keep the finish button visible and flush with bottom */
+.workout-controls {
+    position: sticky;
+    bottom: 0;
+    background: var(--background);
+    padding: 1rem 2rem;
+    border-top: 1px solid var(--border-color);
+    z-index: 100;
+    backdrop-filter: blur(8px);
+    margin-top: auto;  /* Push to bottom */
+}
+
+/* Mobile adjustments */
+@media (max-width: 640px) {
+    .workout-content {
+        margin: 0 -1rem;
+    }
+
+    .workout-progress {
+        padding: 1rem;
+    }
+
+    .workout-controls {
+        padding: 1rem;
     }
 }

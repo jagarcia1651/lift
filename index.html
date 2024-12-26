@@ -3,43 +3,101 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <meta name="description" content="Power Routine Calculator">
-    <title>Power Routine</title>
+    <meta name="description" content="Calculate and track your power routine workouts">
+    <meta name="theme-color" content="#3b82f6">
+    <title>Power Routine Calculator</title>
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
     <main>
-        <h1>Power Routine</h1>
-        <div class="input-container">
-            <div class="input-group">
-                <label for="today-date">Today:</label>
-                <input type="date" id="today-date" aria-label="Today's date">
-            </div>
-            <div class="input-group">
-                <label for="program-start">Program Start:</label>
-                <input type="date" id="program-start" aria-label="Program start date" value="2024-12-09">
-            </div>
-            <div class="input-group">
-                <label for="squat-1rm">Squat 1RM:</label>
-                <input type="number" id="squat-1rm" min="0" placeholder="Enter 1RM" value="315">
-            </div>
-            <div class="input-group">
-                <label for="bench-1rm">Bench 1RM:</label>
-                <input type="number" id="bench-1rm" min="0" placeholder="Enter 1RM" value="225">
-            </div>
-            <div class="input-group">
-                <label for="deadlift-1rm">Deadlift 1RM:</label>
-                <input type="number" id="deadlift-1rm" min="0" placeholder="Enter 1RM" value="405">
-            </div>
-            <button type="button" class="calculate-btn" onclick="updateWeights()">Update Weights</button>
+        <div class="theme-switch" role="switch" aria-checked="false">
+            <label class="switch" for="theme-toggle">
+                <input 
+                    type="checkbox" 
+                    id="theme-toggle" 
+                    aria-label="Toggle dark mode"
+                >
+                <span class="slider" aria-hidden="true">
+                    <svg class="sun" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M12 17.5a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11Zm0-12.5V2m0 20v-3m8.5-5h3m-20 0h3m2.122-7.378L6.5 4.5m11 11l2.122 2.122M6.5 19.5l-2.122 2.122M19.5 6.5l-2.122-2.122" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
+                    </svg>
+                    <svg class="moon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                        <path d="M21.752 15.002A9.718 9.718 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
+                    </svg>
+                </span>
+            </label>
         </div>
         
+        <h1>Power Routine Calculator</h1>
+        
+        <form class="input-container" onsubmit="event.preventDefault();">
+            <div class="input-group">
+                <label for="today-date">Today's Date</label>
+                <input 
+                    type="date" 
+                    id="today-date" 
+                    required 
+                    aria-label="Today's date"
+                >
+            </div>
+            <div class="input-group">
+                <label for="program-start">Program Start Date</label>
+                <input 
+                    type="date" 
+                    id="program-start" 
+                    required
+                    aria-label="Program start date" 
+                    value="2024-12-09"
+                >
+            </div>
+            <div class="input-group">
+                <label for="squat-1rm">Squat 1RM (lbs)</label>
+                <input 
+                    type="number" 
+                    id="squat-1rm" 
+                    min="0" 
+                    required
+                    placeholder="Enter weight" 
+                    value="315"
+                >
+            </div>
+            <div class="input-group">
+                <label for="bench-1rm">Bench 1RM (lbs)</label>
+                <input 
+                    type="number" 
+                    id="bench-1rm" 
+                    min="0" 
+                    required
+                    placeholder="Enter weight" 
+                    value="225"
+                >
+            </div>
+            <div class="input-group">
+                <label for="deadlift-1rm">Deadlift 1RM (lbs)</label>
+                <input 
+                    type="number" 
+                    id="deadlift-1rm" 
+                    min="0" 
+                    required
+                    placeholder="Enter weight" 
+                    value="405"
+                >
+            </div>
+            <button 
+                type="button" 
+                class="calculate-btn" 
+                onclick="updateWeights()"
+            >
+                Update Weights
+            </button>
+        </form>
+        
         <div class="routine-container">
-            <div id="routine-display">
+            <div id="routine-display" role="region" aria-live="polite">
                 <!-- Dynamic content will be inserted here -->
             </div>
         </div>
-        <script src="script.js"></script>
     </main>
+    <script src="script.js"></script>
 </body>
 </html>

@@ -1,24 +1,58 @@
+/*
+ * Power Routine Calculator
+ * Main Stylesheet
+ */
+
+/* -----------------------------
+ * CSS Variables & Theme Colors
+ * ---------------------------- */
 :root {
-    --primary-color: #3b82f6;  /* Softer blue */
-    --primary-hover: #60a5fa;  /* Lighter blue on hover */
-    --secondary-color: #64748b; /* Slate */
-    --accent-color: #0ea5e9;   /* Sky blue */
-    --success-color: #10b981;  /* Softer emerald */
-    --text-primary: #334155;   /* Slate 700 */
-    --text-secondary: #64748b; /* Slate 500 */
-    --text-light: #94a3b8;     /* Slate 400 */
-    --background: #f8fafc;     /* Slate 50 */
+    /* Light theme */
+    --primary-color: #3b82f6;
+    --primary-hover: #60a5fa;
+    --secondary-color: #64748b;
+    --accent-color: #0ea5e9;
+    --success-color: #10b981;
+    
+    /* Typography */
+    --text-primary: #334155;
+    --text-secondary: #64748b;
+    --text-light: #94a3b8;
+    
+    /* Layout */
+    --background: #f8fafc;
     --card-bg: #ffffff;
-    --border-color: #e2e8f0;   /* Slate 200 */
+    --border-color: #e2e8f0;
     --shadow-color: rgb(51 65 85 / 0.08);
-    --shadow-sm: 0 1px 2px var(--shadow-color);
-    --shadow: 0 4px 6px -1px var(--shadow-color);
-    --shadow-lg: 0 10px 15px -3px var(--shadow-color);
-    --radius-sm: 8px;
-    --radius: 12px;
-    --radius-lg: 16px;
+    
+    /* Common values */
+    --header-height: 4rem;
+    --border-radius: 8px;
+    --transition-speed: 0.2s;
 }
 
+[data-theme="dark"] {
+    --primary-color: #60a5fa;
+    --primary-hover: #93c5fd;
+    --secondary-color: #94a3b8;
+    --accent-color: #38bdf8;
+    --success-color: #34d399;
+    
+    /* Typography */
+    --text-primary: #f1f5f9;
+    --text-secondary: #cbd5e1;
+    --text-light: #94a3b8;
+    
+    /* Layout */
+    --background: #0f172a;
+    --card-bg: #1e293b;
+    --border-color: #334155;
+    --shadow-color: rgb(0 0 0 / 0.3);
+}
+
+/* -----------------------------
+ * Base Styles
+ * ---------------------------- */
 body {
     font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
     background-color: var(--background);
@@ -30,7 +64,8 @@ body {
 main {
     max-width: 1000px;
     margin: 0 auto;
-    padding: 2rem;
+    padding: var(--header-height) 2rem 2rem;
+    position: relative;
 }
 
 h1 {
@@ -38,46 +73,110 @@ h1 {
     color: var(--primary-color);
     font-size: 2.5rem;
     font-weight: 800;
-    margin: 2rem 0;
+    margin: 1rem 0 3rem;
     letter-spacing: -0.025em;
 }
 
-/* Input Container Styling */
-.input-container {
-    background: var(--card-bg);
-    padding: 2rem;
-    border-radius: var(--radius-lg);
-    box-shadow: var(--shadow);
-    display: flex;
-    flex-wrap: wrap;
-    justify-content: space-between;
-    gap: 1.5rem;
-    margin-bottom: 2rem;
+/* -----------------------------
+ * Theme Switch
+ * ---------------------------- */
+.theme-switch {
+    position: absolute;
+    top: 2rem;
+    right: 2rem;
+    z-index: 10;
 }
 
-/* Input group wrapper */
+.switch {
+    position: relative;
+    display: inline-block;
+    width: 60px;
+    height: 34px;
+    cursor: pointer;
+}
+
+.switch input {
+    opacity: 0;
+    width: 0;
+    height: 0;
+}
+
+.slider {
+    position: absolute;
+    inset: 0;
+    background-color: var(--card-bg);
+    border: 1px solid var(--border-color);
+    transition: var(--transition-speed);
+    border-radius: 34px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    padding: 0 4px;
+}
+
+.slider:before {
+    position: absolute;
+    content: "";
+    height: 26px;
+    width: 26px;
+    left: 4px;
+    bottom: 3px;
+    background-color: var(--primary-color);
+    transition: var(--transition-speed);
+    border-radius: 50%;
+}
+
+input:checked + .slider:before {
+    transform: translateX(26px);
+}
+
+.sun, .moon {
+    width: 16px;
+    height: 16px;
+    color: var(--text-secondary);
+}
+
+.sun { margin-left: 4px; }
+.moon { margin-right: 4px; }
+
+/* -----------------------------
+ * Input Section
+ * ---------------------------- */
+.input-container {
+    background: var(--card-bg);
+    padding: 2.5rem;
+    border-radius: var(--border-radius);
+    box-shadow: 0 4px 6px -1px var(--shadow-color);
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem 3rem;
+    margin: 2rem 0;
+}
+
 .input-group {
-    flex: 1;
-    min-width: 200px;
+    width: 100%;
     display: flex;
     flex-direction: column;
+    gap: 0.75rem;
 }
 
 .input-container label {
-    display: block;
     font-size: 0.875rem;
     font-weight: 600;
     color: var(--text-secondary);
-    margin-bottom: 0.5rem;
 }
 
 .input-container input {
     width: 100%;
-    padding: 0.75rem 1rem;
+    height: 48px;
+    padding: 0 1rem;
     border: 1px solid var(--border-color);
-    border-radius: var(--radius);
+    border-radius: var(--border-radius);
     font-size: 1rem;
-    transition: all 0.2s;
+    background-color: var(--card-bg);
+    color: var(--text-primary);
+    transition: var(--transition-speed);
+    box-sizing: border-box;
 }
 
 .input-container input:focus {
@@ -87,17 +186,19 @@ h1 {
 }
 
 .calculate-btn {
+    grid-column: 1 / -1;
     width: 100%;
-    margin-top: 1rem;
+    height: 48px;
+    margin-top: 0.5rem;
     background-color: var(--primary-color);
     color: white;
-    padding: 0.875rem 1.5rem;
+    padding: 0 1.5rem;
     border: none;
-    border-radius: var(--radius);
+    border-radius: var(--border-radius);
     font-weight: 600;
     font-size: 1rem;
     cursor: pointer;
-    transition: all 0.2s;
+    transition: var(--transition-speed);
 }
 
 .calculate-btn:hover {
@@ -105,20 +206,22 @@ h1 {
     transform: translateY(-1px);
 }
 
-/* Workout Card Styling */
+/* -----------------------------
+ * Workout Display
+ * ---------------------------- */
 .workout-card {
     background: var(--card-bg);
-    border-radius: var(--radius-lg);
+    border-radius: var(--border-radius);
     padding: 1.5rem;
     margin-bottom: 1.5rem;
-    box-shadow: var(--shadow);
+    box-shadow: 0 4px 6px -1px var(--shadow-color);
     border: 1px solid var(--border-color);
-    transition: transform 0.2s ease, box-shadow 0.2s ease;
+    transition: var(--transition-speed);
 }
 
 .workout-card:hover {
     transform: translateY(-2px);
-    box-shadow: var(--shadow-lg);
+    box-shadow: 0 10px 15px -3px var(--shadow-color);
 }
 
 .workout-header {
@@ -153,12 +256,15 @@ h1 {
     background: var(--accent-color);
     color: white;
     padding: 0.625rem 1.25rem;
-    border-radius: var(--radius);
+    border-radius: var(--border-radius);
     font-weight: 600;
     font-size: 0.875rem;
-    box-shadow: var(--shadow-sm);
+    box-shadow: 0 1px 2px var(--shadow-color);
 }
 
+/* -----------------------------
+ * Accessories Section
+ * ---------------------------- */
 .accessories-section h3 {
     color: var(--text-secondary);
     font-size: 1.25rem;
@@ -170,18 +276,18 @@ h1 {
     padding: 0.75rem 1rem;
     margin-bottom: 0.5rem;
     background: var(--background);
-    border-radius: var(--radius);
+    border-radius: var(--border-radius);
     display: grid;
     grid-template-columns: minmax(0, 1fr) auto auto;
     gap: 1rem;
     align-items: center;
-    transition: all 0.2s ease;
     border: 1px solid var(--border-color);
+    transition: var(--transition-speed);
 }
 
 .accessory:hover {
     transform: translateX(4px);
-    background: white;
+    background: var(--card-bg);
     border-color: var(--accent-color);
 }
 
@@ -202,18 +308,19 @@ h1 {
     color: var(--text-primary);
 }
 
-.sets-reps, .weight {
+.sets-reps,
+.weight {
     white-space: nowrap;
     min-width: 80px;
     text-align: center;
     padding: 0.5rem 1rem;
     background: var(--card-bg);
-    border-radius: var(--radius-sm);
+    border-radius: var(--border-radius);
     font-size: 0.875rem;
     color: var(--text-secondary);
     font-weight: 500;
     border: 1px solid var(--border-color);
-    transition: all 0.2s ease;
+    transition: var(--transition-speed);
 }
 
 .accessory:hover .sets-reps,
@@ -222,65 +329,31 @@ h1 {
     color: var(--accent-color);
 }
 
-/* Dark mode */
-@media (prefers-color-scheme: dark) {
-    :root {
-        --background: #0f172a;    /* Slate 900 */
-        --card-bg: #1e293b;       /* Slate 800 */
-        --text-primary: #f1f5f9;  /* Slate 100 */
-        --text-secondary: #cbd5e1; /* Slate 300 */
-        --text-light: #94a3b8;    /* Slate 400 */
-        --border-color: #334155;  /* Slate 700 */
-        --shadow-color: rgb(0 0 0 / 0.3);
-    }
-
-    .accessory:hover {
-        background: var(--card-bg);
-    }
-
-    .workout-card {
-        background: var(--card-bg);
-        border-color: var(--border-color);
-    }
-
-    .input-container {
-        background: var(--card-bg);
-    }
-
-    .input-container input {
-        background-color: var(--background);
-        color: var(--text-primary);
-        border-color: var(--border-color);
-    }
-
-    .input-container input:focus {
-        border-color: var(--accent-color);
-        box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
-    }
-}
-
-/* Mobile Responsiveness */
+/* -----------------------------
+ * Mobile Responsiveness
+ * ---------------------------- */
 @media (max-width: 640px) {
     main {
-        padding: 1rem;
+        padding: var(--header-height) 1rem 1rem;
+    }
+
+    .theme-switch {
+        top: 1rem;
+        right: 1rem;
     }
 
     .input-container {
         padding: 1.5rem;
+        gap: 1.5rem;
+        grid-template-columns: 1fr;
+    }
+
+    .input-group {
+        gap: 0.5rem;
     }
 
     .workout-card {
         padding: 1.5rem;
-    }
-
-    .accessory {
-        grid-template-columns: 1fr;
-        gap: 0.75rem;
-        padding: 0.75rem;
-    }
-
-    .sets-reps, .weight {
-        text-align: left;
     }
 
     .workout-meta {
@@ -288,16 +361,15 @@ h1 {
         gap: 0.5rem;
     }
 
-    .input-group {
-        flex: 1 1 100%;
-    }
-    
     .accessory {
         grid-template-columns: 1fr;
+        gap: 0.75rem;
+        padding: 0.75rem;
         text-align: left;
     }
-    
-    .sets-reps, .weight {
+
+    .sets-reps,
+    .weight {
         text-align: left;
         min-width: unset;
     }

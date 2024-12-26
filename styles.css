@@ -504,3 +504,160 @@ input:checked + .slider:before {
     opacity: 0.5;
     animation: pulse 2s ease-in-out infinite;
 }
+
+/* Add accessory selection styles */
+.accessory {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+    padding: 0.5rem;
+    border-radius: var(--border-radius);
+    transition: var(--transition-speed);
+}
+
+.accessory:hover {
+    background: var(--background);
+}
+
+.accessory-info {
+    flex: 1;
+}
+
+.change-accessory-btn {
+    padding: 0.25rem 0.5rem;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    font-size: 1.25rem;
+    line-height: 1;
+}
+
+.change-accessory-btn:hover {
+    background: var(--background);
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+[data-theme="dark"] .change-accessory-btn {
+    background: var(--background);
+}
+
+[data-theme="dark"] .change-accessory-btn:hover {
+    background: var(--card-bg);
+}
+
+/* Update accessory controls styling */
+.accessory-controls {
+    display: flex;
+    gap: 0.5rem;
+}
+
+.change-accessory-btn,
+.remove-accessory-btn {
+    padding: 0.25rem 0.5rem;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    color: var(--text-secondary);
+    font-size: 1.25rem;
+    line-height: 1;
+}
+
+.change-accessory-btn:hover {
+    background: var(--background);
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+}
+
+.remove-accessory-btn:hover {
+    background: var(--background);
+    color: #ef4444;  /* Red color for delete */
+    border-color: #ef4444;
+}
+
+[data-theme="dark"] .change-accessory-btn,
+[data-theme="dark"] .remove-accessory-btn {
+    background: var(--background);
+}
+
+[data-theme="dark"] .change-accessory-btn:hover,
+[data-theme="dark"] .remove-accessory-btn:hover {
+    background: var(--card-bg);
+}
+
+/* Add accessory button styling */
+.add-accessory-btn {
+    width: 100%;
+    margin-top: 0.5rem;
+    padding: 0.5rem;
+    background: var(--background);
+    border: 1px dashed var(--border-color);
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 0.5rem;
+}
+
+.add-accessory-btn:hover {
+    color: var(--primary-color);
+    border-color: var(--primary-color);
+    background: var(--card-bg);
+}
+
+[data-theme="dark"] .add-accessory-btn {
+    background: var(--card-bg);
+}
+
+[data-theme="dark"] .add-accessory-btn:hover {
+    background: var(--background);
+}
+
+/* Primary lift styling */
+.exercise-row.primary {
+    background: var(--card-bg);
+    border-width: 2px;
+}
+
+.exercise-row.primary h3 {
+    font-size: 1.25rem;
+    color: var(--primary-color);
+}
+
+/* Accessory lift styling */
+.exercise-row.accessory {
+    opacity: 0.5;
+    pointer-events: none;
+    position: relative;
+}
+
+.exercise-row.accessory::before {
+    content: "Complete primary lift first";
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate(-50%, -50%);
+    background: var(--card-bg);
+    padding: 0.5rem 1rem;
+    border-radius: var(--border-radius);
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    opacity: 0;
+    transition: opacity var(--transition-speed);
+    pointer-events: none;
+}
+
+.exercise-row.accessory:hover::before {
+    opacity: 1;
+}
+
+/* Enable accessories when primary is complete */
+.exercise-row.accessory.available {
+    opacity: 1;
+    pointer-events: auto;
+}
+
+.exercise-row.accessory.available::before {
+    display: none;
+}

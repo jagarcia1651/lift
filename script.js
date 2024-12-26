@@ -51,6 +51,33 @@ const ACCESSORIES = Object.freeze({
     ]
 });
 
+const ACCESSORY_POOLS = {
+    "legs": [
+        { exercise: "Leg Extension", setsReps: "3x15", weight: "~20RM" },
+        { exercise: "Leg Press", setsReps: "3x15", weight: "~20RM" },
+        { exercise: "Hack Squat", setsReps: "3x12", weight: "~15RM" },
+        { exercise: "Front Squat", setsReps: "3x8", weight: "~12RM" },
+        { exercise: "Bulgarian Split Squats", setsReps: "3x8", weight: "~10RM" },
+        { exercise: "Walking Lunges", setsReps: "3x12-10-8", weight: "~15RM" }
+    ],
+    "push": [
+        { exercise: "Incline Bench", setsReps: "3x8", weight: "~10RM" },
+        { exercise: "Dumbbell Press", setsReps: "3x10", weight: "~12RM" },
+        { exercise: "Military Press", setsReps: "3x8", weight: "~10RM" },
+        { exercise: "Lateral Raises", setsReps: "3x12", weight: "~15RM" },
+        { exercise: "Tricep Extensions", setsReps: "3x15", weight: "~20RM" },
+        { exercise: "Skull Crushers", setsReps: "3x12", weight: "~15RM" }
+    ],
+    "pull": [
+        { exercise: "Barbell Rows", setsReps: "3x12-10-8", weight: "~15RM" },
+        { exercise: "Pull-ups", setsReps: "3xMax", weight: "Bodyweight" },
+        { exercise: "Face Pulls", setsReps: "3x15", weight: "~20RM" },
+        { exercise: "Lat Pulldowns", setsReps: "3x12", weight: "~15RM" },
+        { exercise: "Hammer Curls", setsReps: "3x12", weight: "~15RM" },
+        { exercise: "Preacher Curls", setsReps: "3x12", weight: "~15RM" }
+    ]
+};
+
 // -------------------------
 // State Management
 // -------------------------
@@ -250,10 +277,18 @@ function completeSet(exerciseId) {
     const exercise = workoutState.sets.get(exerciseId);
     if (!exercise || exercise.completedSets >= exercise.totalSets) return;
     
+    // Prevent accessory completion if primary isn't done
+    if (exerciseId !== 'primary' && !isPrimaryComplete()) return;
+    
     exercise.completedSets++;
     workoutState.sets.set(exerciseId, exercise);
     
     updateExerciseUI(exerciseId, exercise);
+    
+    // If primary was just completed, refresh to enable accessories
+    if (exerciseId === 'primary' && isPrimaryComplete()) {
+        generateWorkoutContent();
+    }
 }
 
 function finishWorkout() {
@@ -397,7 +432,11 @@ function generateWorkoutContent() {
     const [totalSets, reps] = setsReps.split('x').map(Number);
     const accessories = getRotatedAccessories(lift, getProgramWeek());
     
-    initializeExerciseStates(totalSets, reps, accessories);
+    // Only initialize states if they don't exist
+    if (workoutState.sets.size === 0) {
+        initializeExerciseStates(totalSets, reps, accessories);
+    }
+    
     renderWorkoutContent(container, lift, weight, totalSets, reps, accessories);
     addExerciseClickHandlers();
 }
@@ -429,7 +468,7 @@ function initializeExerciseStates(totalSets, reps, accessories) {
 function renderWorkoutContent(container, lift, weight, totalSets, reps, accessories) {
     container.innerHTML = `
         <div class="exercise-list">
-            <div class="exercise-row ${workoutState.sets.get('primary').completedSets === 0 ? 'active' : ''}" 
+            <div class="exercise-row primary ${workoutState.sets.get('primary').completedSets === 0 ? 'active' : ''}" 
                  data-exercise-id="primary">
                 <div class="exercise-info">
                     <h3>${lift}</h3>
@@ -456,11 +495,15 @@ function renderWorkoutContent(container, lift, weight, totalSets, reps, accessor
 }
 
 function generateAccessoryRows(accessories) {
+    const primaryComplete = isPrimaryComplete();
+    
     return accessories.map((acc, i) => {
         const exerciseState = workoutState.sets.get(`accessory-${i}`);
         const [sets, reps] = acc.setsReps.split('x');
+        const isAvailable = primaryComplete || exerciseState.completedSets > 0;
+        
         return `
-            <div class="exercise-row ${shouldBeActive(i) ? 'active' : ''}" 
+            <div class="exercise-row accessory ${isAvailable ? 'available' : ''} ${shouldBeActive(i) ? 'active' : ''}" 
                  data-exercise-id="accessory-${i}">
                 <div class="exercise-info">
                     <h3>${acc.exercise}</h3>
@@ -576,6 +619,12 @@ function getSetsAndReps() {
 }
 
 function getRotatedAccessories(lift, week) {
+    // Try to get saved accessories first
+    const key = `accessories_${lift}_${week}`;
+    const saved = localStorage.getItem(key);
+    if (saved) return JSON.parse(saved);
+    
+    // Fall back to default accessories
     return ACCESSORIES[lift] || [];
 }
 
@@ -644,11 +693,39 @@ function generateRoutinePreview() {
                 <p>${weight} lbs × ${setsReps}</p>
             </div>
             <div class="accessories">
-                ${accessories.map(acc => `
-                    <div class="accessory">
-                        <p>${acc.exercise}: ${acc.setsReps} @ ${acc.weight}</p>
+                ${accessories.map((acc, index) => `
+                    <div class="accessory" data-index="${index}">
+                        <div class="accessory-info">
+                            <p>${acc.exercise}: ${acc.setsReps} @ ${acc.weight}</p>
+                        </div>
+                        <div class="accessory-controls">
+                            <button 
+                                type="button" 
+                                class="change-accessory-btn" 
+                                onclick="changeAccessory(${index})"
+                                aria-label="Change accessory exercise"
+                            >
+                                ↻
+                            </button>
+                            <button 
+                                type="button" 
+                                class="remove-accessory-btn" 
+                                onclick="removeAccessory(${index})"
+                                aria-label="Remove accessory exercise"
+                            >
+                                ×
+                            </button>
+                        </div>
                     </div>
                 `).join('')}
+                <button 
+                    type="button" 
+                    class="add-accessory-btn" 
+                    onclick="addAccessory()"
+                    aria-label="Add accessory exercise"
+                >
+                    + Add Accessory
+                </button>
             </div>
         </div>
     `;
@@ -666,4 +743,86 @@ function shouldBeActive(index) {
     
     return previousExercise?.completedSets === previousExercise?.totalSets &&
            currentExercise?.completedSets < currentExercise?.totalSets;
+}
+
+// Add new functions for accessory management
+function changeAccessory(index) {
+    const lift = getLiftOfTheDay();
+    const pool = getAccessoryPool(lift);
+    const currentAccessories = getRotatedAccessories(lift, getProgramWeek());
+    const currentExercise = currentAccessories[index];
+    
+    // Get new random exercise from pool that's not currently used
+    const availableExercises = ACCESSORY_POOLS[pool].filter(exercise => 
+        !currentAccessories.some(acc => acc.exercise === exercise.exercise)
+    );
+    
+    if (availableExercises.length === 0) return; // No more options available
+    
+    const randomIndex = Math.floor(Math.random() * availableExercises.length);
+    currentAccessories[index] = availableExercises[randomIndex];
+    
+    // Save to localStorage
+    const key = `accessories_${lift}_${getProgramWeek()}`;
+    localStorage.setItem(key, JSON.stringify(currentAccessories));
+    
+    // Refresh display
+    generateRoutinePreview();
+}
+
+function getAccessoryPool(lift) {
+    if (lift.toLowerCase().includes('squat')) return 'legs';
+    if (lift.toLowerCase().includes('bench')) return 'push';
+    if (lift.toLowerCase().includes('dead')) return 'pull';
+    return '';
+}
+
+// Add new function to remove accessories
+function removeAccessory(index) {
+    const lift = getLiftOfTheDay();
+    const currentAccessories = getRotatedAccessories(lift, getProgramWeek());
+    
+    // Remove the accessory at the specified index
+    currentAccessories.splice(index, 1);
+    
+    // Save to localStorage
+    const key = `accessories_${lift}_${getProgramWeek()}`;
+    localStorage.setItem(key, JSON.stringify(currentAccessories));
+    
+    // Refresh display
+    generateRoutinePreview();
+}
+
+// Add new function to add accessories
+function addAccessory() {
+    const lift = getLiftOfTheDay();
+    const pool = getAccessoryPool(lift);
+    const currentAccessories = getRotatedAccessories(lift, getProgramWeek());
+    
+    // Get available exercises not currently in use
+    const availableExercises = ACCESSORY_POOLS[pool].filter(exercise => 
+        !currentAccessories.some(acc => acc.exercise === exercise.exercise)
+    );
+    
+    if (availableExercises.length === 0) {
+        alert('No more exercises available in this category');
+        return;
+    }
+    
+    // Add random exercise from available pool
+    const randomIndex = Math.floor(Math.random() * availableExercises.length);
+    currentAccessories.push(availableExercises[randomIndex]);
+    
+    // Save to localStorage
+    const key = `accessories_${lift}_${getProgramWeek()}`;
+    localStorage.setItem(key, JSON.stringify(currentAccessories));
+    
+    // Refresh display
+    generateRoutinePreview();
+}
+
+// Add helper function to check primary completion
+function isPrimaryComplete() {
+    const primary = workoutState.sets.get('primary');
+    return primary.completedSets === primary.totalSets;
 }

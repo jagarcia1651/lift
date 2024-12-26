@@ -1,367 +1,304 @@
 :root {
-    --primary-color: #4CAF50;
-    --primary-hover: #45a049;
-    --text-color: #333;
-    --border-color: #ddd;
-    --shadow: 0 2px 5px rgba(0, 0, 0, 0.1);
-    --spacing: 20px;
-}
-
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
+    --primary-color: #3b82f6;  /* Softer blue */
+    --primary-hover: #60a5fa;  /* Lighter blue on hover */
+    --secondary-color: #64748b; /* Slate */
+    --accent-color: #0ea5e9;   /* Sky blue */
+    --success-color: #10b981;  /* Softer emerald */
+    --text-primary: #334155;   /* Slate 700 */
+    --text-secondary: #64748b; /* Slate 500 */
+    --text-light: #94a3b8;     /* Slate 400 */
+    --background: #f8fafc;     /* Slate 50 */
+    --card-bg: #ffffff;
+    --border-color: #e2e8f0;   /* Slate 200 */
+    --shadow-color: rgb(51 65 85 / 0.08);
+    --shadow-sm: 0 1px 2px var(--shadow-color);
+    --shadow: 0 4px 6px -1px var(--shadow-color);
+    --shadow-lg: 0 10px 15px -3px var(--shadow-color);
+    --radius-sm: 8px;
+    --radius: 12px;
+    --radius-lg: 16px;
 }
 
 body {
     font-family: system-ui, -apple-system, 'Segoe UI', Roboto, sans-serif;
-    background-color: #f4f4f9;
-    color: var(--text-color);
-    margin: var(--spacing);
-    line-height: 1.5;
+    background-color: var(--background);
+    color: var(--text-primary);
+    margin: 0;
+    line-height: 1.6;
+}
+
+main {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: 2rem;
 }
 
 h1 {
     text-align: center;
-    color: var(--text-color);
-    margin-bottom: var(--spacing);
+    color: var(--primary-color);
     font-size: 2.5rem;
+    font-weight: 800;
+    margin: 2rem 0;
+    letter-spacing: -0.025em;
 }
 
+/* Input Container Styling */
 .input-container {
+    background: var(--card-bg);
+    padding: 2rem;
+    border-radius: var(--radius-lg);
+    box-shadow: var(--shadow);
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
-    gap: var(--spacing);
-    margin-bottom: 30px;
+    justify-content: space-between;
+    gap: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+/* Input group wrapper */
+.input-group {
+    flex: 1;
+    min-width: 200px;
+    display: flex;
+    flex-direction: column;
 }
 
 .input-container label {
-    font-size: 1rem;
+    display: block;
+    font-size: 0.875rem;
     font-weight: 600;
-    margin-top: 8px;
-    color: var(--text-color);
+    color: var(--text-secondary);
+    margin-bottom: 0.5rem;
 }
 
 .input-container input {
-    padding: 12px 16px;
-    width: 180px;
-    font-size: 1rem;
+    width: 100%;
+    padding: 0.75rem 1rem;
     border: 1px solid var(--border-color);
-    border-radius: 8px;
-    box-shadow: var(--shadow);
-    transition: border 0.3s ease;
+    border-radius: var(--radius);
+    font-size: 1rem;
+    transition: all 0.2s;
 }
 
 .input-container input:focus {
     border-color: var(--primary-color);
+    box-shadow: 0 0 0 3px rgba(37, 99, 235, 0.1);
     outline: none;
 }
 
 .calculate-btn {
-    padding: 12px 24px;
+    width: 100%;
+    margin-top: 1rem;
     background-color: var(--primary-color);
     color: white;
+    padding: 0.875rem 1.5rem;
     border: none;
-    border-radius: 8px;
-    cursor: pointer;
+    border-radius: var(--radius);
+    font-weight: 600;
     font-size: 1rem;
-    transition: background-color 0.3s ease;
+    cursor: pointer;
+    transition: all 0.2s;
 }
 
 .calculate-btn:hover {
     background-color: var(--primary-hover);
+    transform: translateY(-1px);
 }
 
-.routine-container {
-    max-width: 800px;
-    margin: 30px auto;
-    padding: 0 20px;
-}
-
+/* Workout Card Styling */
 .workout-card {
-    background: white;
-    border-radius: 12px;
-    padding: 24px;
-    margin-bottom: 20px;
+    background: var(--card-bg);
+    border-radius: var(--radius-lg);
+    padding: 1.5rem;
+    margin-bottom: 1.5rem;
     box-shadow: var(--shadow);
+    border: 1px solid var(--border-color);
+    transition: transform 0.2s ease, box-shadow 0.2s ease;
+}
+
+.workout-card:hover {
+    transform: translateY(-2px);
+    box-shadow: var(--shadow-lg);
 }
 
 .workout-header {
-    margin-bottom: 20px;
-    padding-bottom: 15px;
+    margin-bottom: 1.5rem;
+    padding-bottom: 1.5rem;
     border-bottom: 2px solid var(--border-color);
 }
 
 .workout-meta {
     display: flex;
     justify-content: space-between;
-    color: #666;
-    font-size: 0.9rem;
-    margin-bottom: 8px;
-}
-
-.primary-lift {
-    margin: 15px 0;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+    font-weight: 500;
 }
 
 .primary-lift h2 {
-    font-size: 1.5rem;
-    color: var(--text-color);
-    margin-bottom: 10px;
+    font-size: 1.75rem;
+    color: var(--primary-color);
+    margin: 1rem 0;
+    font-weight: 700;
 }
 
 .lift-details {
     display: flex;
-    gap: 20px;
+    gap: 0.75rem;
     flex-wrap: wrap;
+    margin-top: 0.75rem;
 }
 
 .lift-detail {
-    padding: 8px 16px;
-    background: #f5f5f5;
-    border-radius: 6px;
-    font-weight: 500;
-}
-
-.accessories-section {
-    margin-top: 20px;
+    background: var(--accent-color);
+    color: white;
+    padding: 0.625rem 1.25rem;
+    border-radius: var(--radius);
+    font-weight: 600;
+    font-size: 0.875rem;
+    box-shadow: var(--shadow-sm);
 }
 
 .accessories-section h3 {
-    font-size: 1.2rem;
-    color: #666;
-    margin-bottom: 15px;
+    color: var(--text-secondary);
+    font-size: 1.25rem;
+    margin-bottom: 1.25rem;
+    font-weight: 600;
 }
 
 .accessory {
-    padding: 12px;
-    margin-bottom: 10px;
-    background: #f9f9f9;
-    border-radius: 8px;
+    padding: 0.75rem 1rem;
+    margin-bottom: 0.5rem;
+    background: var(--background);
+    border-radius: var(--radius);
     display: grid;
-    grid-template-columns: 1fr auto auto;
-    gap: 15px;
+    grid-template-columns: minmax(0, 1fr) auto auto;
+    gap: 1rem;
     align-items: center;
+    transition: all 0.2s ease;
+    border: 1px solid var(--border-color);
 }
 
-.accessory:last-child {
-    margin-bottom: 0;
-}
-
-.exercise {
-    font-weight: 500;
-}
-
-.sets-reps, .weight {
-    padding: 4px 12px;
+.accessory:hover {
+    transform: translateX(4px);
     background: white;
-    border-radius: 4px;
-    font-size: 0.9rem;
-    color: #666;
+    border-color: var(--accent-color);
 }
 
 .accessory-header {
     background: none;
-    font-size: 0.8rem;
+    font-size: 0.75rem;
     text-transform: uppercase;
-    color: #666;
-    letter-spacing: 0.5px;
-    padding: 0 12px 8px;
-    margin-bottom: 12px;
+    color: var(--text-light);
+    letter-spacing: 0.05em;
+    font-weight: 600;
+    padding: 0 1rem 0.75rem;
+    margin-bottom: 1rem;
     border-bottom: 1px solid var(--border-color);
 }
 
-.accessory-header .exercise,
-.accessory-header .sets-reps,
-.accessory-header .weight {
-    background: none;
-    padding: 0;
+.exercise {
+    font-weight: 600;
+    color: var(--text-primary);
 }
 
-/* Dark mode support */
+.sets-reps, .weight {
+    white-space: nowrap;
+    min-width: 80px;
+    text-align: center;
+    padding: 0.5rem 1rem;
+    background: var(--card-bg);
+    border-radius: var(--radius-sm);
+    font-size: 0.875rem;
+    color: var(--text-secondary);
+    font-weight: 500;
+    border: 1px solid var(--border-color);
+    transition: all 0.2s ease;
+}
+
+.accessory:hover .sets-reps,
+.accessory:hover .weight {
+    border-color: var(--accent-color);
+    color: var(--accent-color);
+}
+
+/* Dark mode */
 @media (prefers-color-scheme: dark) {
+    :root {
+        --background: #0f172a;    /* Slate 900 */
+        --card-bg: #1e293b;       /* Slate 800 */
+        --text-primary: #f1f5f9;  /* Slate 100 */
+        --text-secondary: #cbd5e1; /* Slate 300 */
+        --text-light: #94a3b8;    /* Slate 400 */
+        --border-color: #334155;  /* Slate 700 */
+        --shadow-color: rgb(0 0 0 / 0.3);
+    }
+
+    .accessory:hover {
+        background: var(--card-bg);
+    }
+
     .workout-card {
-        background: #2d2d2d;
+        background: var(--card-bg);
+        border-color: var(--border-color);
     }
-    
-    .lift-detail {
-        background: #333;
+
+    .input-container {
+        background: var(--card-bg);
     }
-    
-    .accessory {
-        background: #333;
+
+    .input-container input {
+        background-color: var(--background);
+        color: var(--text-primary);
+        border-color: var(--border-color);
     }
-    
-    .sets-reps, .weight {
-        background: #2d2d2d;
-    }
-    
-    .accessory-header {
-        color: #999;
+
+    .input-container input:focus {
+        border-color: var(--accent-color);
+        box-shadow: 0 0 0 3px rgba(14, 165, 233, 0.2);
     }
 }
 
-/* Mobile responsiveness */
-@media (max-width: 600px) {
+/* Mobile Responsiveness */
+@media (max-width: 640px) {
+    main {
+        padding: 1rem;
+    }
+
+    .input-container {
+        padding: 1.5rem;
+    }
+
+    .workout-card {
+        padding: 1.5rem;
+    }
+
+    .accessory {
+        grid-template-columns: 1fr;
+        gap: 0.75rem;
+        padding: 0.75rem;
+    }
+
+    .sets-reps, .weight {
+        text-align: left;
+    }
+
     .workout-meta {
         flex-direction: column;
-        gap: 8px;
+        gap: 0.5rem;
+    }
+
+    .input-group {
+        flex: 1 1 100%;
     }
     
     .accessory {
         grid-template-columns: 1fr;
-        gap: 8px;
+        text-align: left;
     }
     
-    .lift-details {
-        flex-direction: column;
-        gap: 10px;
-    }
-}
-
-/* Focus styles for accessibility */
-:focus {
-    outline: 2px solid var(--primary-color);
-    outline-offset: 2px;
-}
-
-/* Print styles */
-@media print {
-    .input-container {
-        display: none;
-    }
-    
-    body {
-        background: none;
-        margin: 0;
-    }
-    
-    .routine-table {
-        box-shadow: none;
-    }
-}
-
-/* Dark mode support */
-@media (prefers-color-scheme: dark) {
-    :root {
-        --text-color: #fff;
-        --border-color: #444;
-    }
-    
-    body {
-        background-color: #1a1a1a;
-    }
-    
-    .routine-table {
-        background-color: #2d2d2d;
-    }
-    
-    .routine-table th {
-        background-color: #333;
-        color: #fff;
-    }
-    
-    .routine-table tr:nth-child(even) {
-        background-color: #383838;
-    }
-    
-    .routine-table tr:hover {
-        background-color: #444;
-    }
-}
-
-/* Mobile responsiveness */
-@media (max-width: 768px) {
-    .input-container {
-        flex-direction: column;
-        align-items: center;
-    }
-
-    .input-container input {
-        width: 100%;
-        max-width: 300px;
-    }
-
-    .calculate-btn {
-        width: 100%;
-        max-width: 300px;
-    }
-}
-
-/* Base responsive container */
-main {
-    max-width: 1200px;
-    margin: 0 auto;
-    padding: 0 20px;
-}
-
-/* Adjust table for smaller screens */
-@media (max-width: 768px) {
-    h1 {
-        font-size: 2rem;
-        margin-bottom: 15px;
-    }
-
-    .input-container {
-        flex-direction: column;
-        align-items: center;
-        gap: 10px;
-    }
-
-    .input-container input,
-    .calculate-btn {
-        width: 100%;
-        max-width: 300px;
-    }
-
-    /* Make table scrollable horizontally */
-    .routine-table-wrapper {
-        overflow-x: auto;
-        margin: 0 -20px;
-        padding: 0 20px;
-        -webkit-overflow-scrolling: touch;
-    }
-
-    .routine-table {
-        min-width: 500px; /* Ensure minimum width for readability */
-    }
-
-    .routine-table th,
-    .routine-table td {
-        padding: 8px 12px;
-        font-size: 0.9rem;
-    }
-}
-
-/* Additional breakpoint for very small screens */
-@media (max-width: 480px) {
-    h1 {
-        font-size: 1.75rem;
-    }
-
-    .input-container label {
-        font-size: 0.9rem;
-    }
-
-    .input-container input,
-    .calculate-btn {
-        padding: 8px 12px;
-        font-size: 0.9rem;
-    }
-}
-
-/* Add support for larger screens */
-@media (min-width: 1200px) {
-    main {
-        padding: 0 40px;
-    }
-
-    .input-container {
-        gap: 30px;
-    }
-
-    .routine-table {
-        margin: 40px auto;
+    .sets-reps, .weight {
+        text-align: left;
+        min-width: unset;
     }
 }

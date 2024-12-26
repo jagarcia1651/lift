@@ -11,16 +11,26 @@
     <main>
         <h1>Power Routine</h1>
         <div class="input-container">
-            <label for="today-date">Today:</label>
-            <input type="date" id="today-date" aria-label="Today's date">
-            <label for="program-start">Program Start:</label>
-            <input type="date" id="program-start" aria-label="Program start date" value="2024-12-09">
-            <label for="squat-1rm">Squat 1RM:</label>
-            <input type="number" id="squat-1rm" min="0" placeholder="Enter 1RM" value="315">
-            <label for="bench-1rm">Bench 1RM:</label>
-            <input type="number" id="bench-1rm" min="0" placeholder="Enter 1RM" value="225">
-            <label for="deadlift-1rm">Deadlift 1RM:</label>
-            <input type="number" id="deadlift-1rm" min="0" placeholder="Enter 1RM" value="405">
+            <div class="input-group">
+                <label for="today-date">Today:</label>
+                <input type="date" id="today-date" aria-label="Today's date">
+            </div>
+            <div class="input-group">
+                <label for="program-start">Program Start:</label>
+                <input type="date" id="program-start" aria-label="Program start date" value="2024-12-09">
+            </div>
+            <div class="input-group">
+                <label for="squat-1rm">Squat 1RM:</label>
+                <input type="number" id="squat-1rm" min="0" placeholder="Enter 1RM" value="315">
+            </div>
+            <div class="input-group">
+                <label for="bench-1rm">Bench 1RM:</label>
+                <input type="number" id="bench-1rm" min="0" placeholder="Enter 1RM" value="225">
+            </div>
+            <div class="input-group">
+                <label for="deadlift-1rm">Deadlift 1RM:</label>
+                <input type="number" id="deadlift-1rm" min="0" placeholder="Enter 1RM" value="405">
+            </div>
             <button type="button" class="calculate-btn" onclick="updateWeights()">Update Weights</button>
         </div>
         

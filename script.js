@@ -395,37 +395,47 @@ function generateRoutinePreview() {
 
     const lift = getLiftOfTheDay();
     if (lift.toLowerCase().includes('rest')) {
-        displayRestDay(previewContainer, programWeek);
+        previewContainer.innerHTML = `
+            <div class="preview-card">
+                <div class="preview-header">
+                    <span class="preview-week">Week ${programWeek}</span>
+                    <span class="preview-day">${getDayOfTheWeek()}</span>
+                </div>
+                <h2>Rest Day</h2>
+            </div>
+        `;
         return;
     }
 
     const accessories = getRotatedAccessories(lift, programWeek);
     
-    const card = document.createElement('div');
-    card.className = 'workout-card';
-    
-    card.innerHTML = `
-        <div class="workout-header">
-            <div class="workout-meta">
-                <span>Week ${programWeek}</span>
-                <span>${getDayOfTheWeek()}</span>
+    previewContainer.innerHTML = `
+        <div class="preview-card">
+            <div class="preview-header">
+                <span class="preview-week">Week ${programWeek}</span>
+                <span class="preview-day">${getDayOfTheWeek()}</span>
             </div>
-            <div class="primary-lift">
+            <div class="preview-main-lift">
                 <h2>${lift}</h2>
-                <div class="lift-details">
-                    <span class="lift-detail">${getWeightOfTheDay()} lbs</span>
-                    <span class="lift-detail">${getSetsAndReps()}</span>
+                <div class="preview-details">
+                    <span>${getWeightOfTheDay()} lbs</span>
+                    <span>•</span>
+                    <span>${getSetsAndReps()}</span>
+                </div>
+            </div>
+            <div class="preview-accessories">
+                <h3>Accessories</h3>
+                <div class="preview-accessory-list">
+                    ${accessories.map(acc => `
+                        <div class="preview-accessory">
+                            <span class="accessory-name">${acc.exercise}</span>
+                            <span class="accessory-scheme">${acc.setsReps}</span>
+                        </div>
+                    `).join('')}
                 </div>
             </div>
         </div>
-        <div class="accessories-section">
-            <h3>Accessories</h3>
-            ${formatAccessories(accessories)}
-        </div>
     `;
-    
-    previewContainer.innerHTML = '';
-    previewContainer.appendChild(card);
 }
 
 /**
@@ -565,7 +575,10 @@ const workoutState = {
     startTime: null,
     timerInterval: null,
     sets: new Map(),
-    currentLift: null
+    currentLift: null,
+    timerPaused: false,
+    pausedTime: null,
+    totalPausedTime: 0
 };
 
 /**
@@ -575,6 +588,9 @@ function startWorkout() {
     workoutState.isActive = true;
     workoutState.startTime = new Date();
     workoutState.currentLift = getLiftOfTheDay();
+    workoutState.timerPaused = false;
+    workoutState.pausedTime = null;
+    workoutState.totalPausedTime = 0;
     
     // Switch views
     document.getElementById('setup-view').classList.remove('active');
@@ -582,6 +598,12 @@ function startWorkout() {
     
     // Initialize timer
     startWorkoutTimer();
+    
+    // Add click handler for timer
+    const timerDisplay = document.querySelector('.timer-display');
+    if (timerDisplay) {
+        timerDisplay.addEventListener('click', toggleTimer);
+    }
     
     // Generate workout content
     generateWorkoutContent();
@@ -615,7 +637,8 @@ function updateTimer() {
     const timerDisplay = document.getElementById('workout-timer');
     if (!timerDisplay || !workoutState.startTime) return;
     
-    const elapsed = new Date() - workoutState.startTime;
+    const now = new Date();
+    const elapsed = now - workoutState.startTime - workoutState.totalPausedTime;
     const seconds = Math.floor((elapsed / 1000) % 60);
     const minutes = Math.floor((elapsed / (1000 * 60)) % 60);
     const hours = Math.floor(elapsed / (1000 * 60 * 60));
@@ -641,104 +664,144 @@ function generateWorkoutContent() {
     
     const weight = getWeightOfTheDay();
     const setsReps = getSetsAndReps();
-    const [sets, reps] = setsReps.split('x').map(Number);
+    const [totalSets, reps] = setsReps.split('x').map(Number);
     const accessories = getRotatedAccessories(lift, getProgramWeek());
     
-    // Generate primary lift sets
-    const primarySets = Array.from({ length: sets }, (_, i) => ({
-        id: `primary-${i + 1}`,
+    // Initialize exercise states
+    workoutState.sets.clear();
+    workoutState.sets.set('primary', { 
         type: 'primary',
+        exercise: lift,
         weight,
         reps,
-        setNumber: i + 1
-    }));
+        totalSets,
+        completedSets: 0
+    });
     
-    // Generate accessory sets
-    const accessorySets = accessories.flatMap((acc, i) => {
+    accessories.forEach((acc, i) => {
         const [sets, reps] = acc.setsReps.split('x');
-        return Array.from({ length: Number(sets) }, (_, j) => ({
-            id: `accessory-${i}-${j + 1}`,
+        workoutState.sets.set(`accessory-${i}`, {
             type: 'accessory',
             exercise: acc.exercise,
             weight: acc.weight,
             reps: Number(reps),
-            setNumber: j + 1
-        }));
-    });
-    
-    // Initialize sets in state
-    [...primarySets, ...accessorySets].forEach(set => {
-        workoutState.sets.set(set.id, { ...set, completed: false });
+            totalSets: Number(sets),
+            completedSets: 0
+        });
     });
     
     // Render workout content
     container.innerHTML = `
-        <div class="set-group">
-            <h3>${lift}</h3>
-            <div class="set-list">
-                ${primarySets.map(set => generateSetHTML(set)).join('')}
-            </div>
-        </div>
-        
-        <div class="set-group">
-            <h3>Accessories</h3>
-            ${accessories.map((acc, i) => `
-                <div class="accessory-group">
-                    <h4>${acc.exercise}</h4>
-                    <div class="set-list">
-                        ${Array.from({ length: Number(acc.setsReps.split('x')[0]) }, (_, j) => 
-                            generateSetHTML({
-                                id: `accessory-${i}-${j + 1}`,
-                                type: 'accessory',
-                                exercise: acc.exercise,
-                                weight: acc.weight,
-                                reps: Number(acc.setsReps.split('x')[1]),
-                                setNumber: j + 1
-                            })
-                        ).join('')}
+        <div class="exercise-list">
+            <div class="exercise-row ${workoutState.sets.get('primary').completedSets === 0 ? 'active' : ''}" 
+                 data-exercise-id="primary">
+                <div class="exercise-info">
+                    <h3>${lift}</h3>
+                    <div class="exercise-details">
+                        <span class="weight-detail">${weight} lbs</span>
+                        <span class="reps-detail">${reps} reps</span>
                     </div>
                 </div>
-            `).join('')}
+                <div class="exercise-progress">
+                    <div class="set-checkmarks">
+                        ${generateSetCheckmarks(totalSets, workoutState.sets.get('primary').completedSets)}
+                    </div>
+                    <div class="set-progress">
+                        <span class="sets-completed">${workoutState.sets.get('primary').completedSets}</span>
+                        <span class="sets-divider">/</span>
+                        <span class="sets-total">${totalSets}</span>
+                    </div>
+                </div>
+            </div>
+            
+            ${accessories.map((acc, i) => {
+                const exerciseState = workoutState.sets.get(`accessory-${i}`);
+                const [sets, reps] = acc.setsReps.split('x');
+                return `
+                    <div class="exercise-row ${shouldBeActive(i) ? 'active' : ''}" 
+                         data-exercise-id="accessory-${i}">
+                        <div class="exercise-info">
+                            <h3>${acc.exercise}</h3>
+                            <div class="exercise-details">
+                                <span class="weight-detail">${acc.weight}</span>
+                                <span class="reps-detail">${reps} reps</span>
+                            </div>
+                        </div>
+                        <div class="exercise-progress">
+                            <div class="set-checkmarks">
+                                ${generateSetCheckmarks(Number(sets), exerciseState.completedSets)}
+                            </div>
+                            <div class="set-progress">
+                                <span class="sets-completed">${exerciseState.completedSets}</span>
+                                <span class="sets-divider">/</span>
+                                <span class="sets-total">${sets}</span>
+                            </div>
+                        </div>
+                    </div>
+                `;
+            }).join('')}
         </div>
     `;
     
     // Add click handlers
-    container.querySelectorAll('.set-checkbox').forEach(checkbox => {
-        checkbox.addEventListener('click', () => toggleSet(checkbox.dataset.setId));
+    container.querySelectorAll('.exercise-row').forEach(row => {
+        row.addEventListener('click', () => completeSet(row.dataset.exerciseId));
     });
 }
 
 /**
- * Generate HTML for a single set
- * @param {Object} set 
- * @returns {string}
+ * Check if an accessory exercise should be active
+ * @param {number} index 
+ * @returns {boolean}
  */
-function generateSetHTML(set) {
-    return `
-        <div class="set-item">
-            <div class="set-checkbox" data-set-id="${set.id}"></div>
-            <div class="set-details">
-                <span class="set-weight">${set.weight}</span>
-                <span class="set-reps">${set.reps} reps</span>
-            </div>
-        </div>
-    `;
+function shouldBeActive(index) {
+    const previousId = index === 0 ? 'primary' : `accessory-${index - 1}`;
+    const currentId = `accessory-${index}`;
+    const previousExercise = workoutState.sets.get(previousId);
+    const currentExercise = workoutState.sets.get(currentId);
+    
+    return previousExercise?.completedSets === previousExercise?.totalSets &&
+           currentExercise?.completedSets < currentExercise?.totalSets;
 }
 
 /**
- * Toggle a set's completion status
- * @param {string} setId 
+ * Complete a set for the given exercise
+ * @param {string} exerciseId 
  */
-function toggleSet(setId) {
-    const set = workoutState.sets.get(setId);
-    if (!set) return;
+function completeSet(exerciseId) {
+    const exercise = workoutState.sets.get(exerciseId);
+    if (!exercise || exercise.completedSets >= exercise.totalSets) return;
     
-    set.completed = !set.completed;
-    workoutState.sets.set(setId, set);
+    exercise.completedSets++;
+    workoutState.sets.set(exerciseId, exercise);
     
-    const checkbox = document.querySelector(`[data-set-id="${setId}"]`);
-    if (checkbox) {
-        checkbox.classList.toggle('checked', set.completed);
+    // Update UI
+    const row = document.querySelector(`[data-exercise-id="${exerciseId}"]`);
+    if (row) {
+        // Update the checkmarks
+        const checkmarks = row.querySelectorAll('.set-mark');
+        checkmarks.forEach((mark, index) => {
+            if (index < exercise.completedSets) {
+                mark.classList.add('completed');
+            } else {
+                mark.classList.remove('completed');
+            }
+        });
+        
+        // Update the counter
+        const setsCompleted = row.querySelector('.sets-completed');
+        if (setsCompleted) {
+            setsCompleted.textContent = exercise.completedSets;
+        }
+        
+        // Update active states
+        if (exercise.completedSets === exercise.totalSets) {
+            row.classList.remove('active');
+            const nextRow = row.nextElementSibling;
+            if (nextRow) {
+                nextRow.classList.add('active');
+            }
+        }
     }
 }
 
@@ -762,4 +825,43 @@ function finishWorkout() {
     
     // Remove unload warning
     window.removeEventListener('beforeunload', handleBeforeUnload);
+}
+
+/**
+ * Toggle timer pause state
+ */
+function toggleTimer() {
+    if (!workoutState.isActive) return;
+    
+    const timerDisplay = document.querySelector('.timer-display');
+    if (!timerDisplay) return;
+    
+    if (workoutState.timerPaused) {
+        // Resume timer
+        workoutState.timerPaused = false;
+        workoutState.totalPausedTime += (new Date() - workoutState.pausedTime);
+        workoutState.pausedTime = null;
+        timerDisplay.classList.remove('paused');
+        workoutState.timerInterval = setInterval(updateTimer, 1000);
+    } else {
+        // Pause timer
+        workoutState.timerPaused = true;
+        workoutState.pausedTime = new Date();
+        timerDisplay.classList.add('paused');
+        clearInterval(workoutState.timerInterval);
+    }
+}
+
+/**
+ * Generate checkmark indicators for sets
+ * @param {number} totalSets 
+ * @param {number} completedSets 
+ * @returns {string}
+ */
+function generateSetCheckmarks(totalSets, completedSets) {
+    return Array.from({ length: totalSets }, (_, i) => `
+        <div class="set-mark ${i < completedSets ? 'completed' : ''}">
+            <div class="circle"></div>
+        </div>
+    `).join('');
 }

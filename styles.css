@@ -175,3 +175,80 @@ h1 {
         max-width: 300px;
     }
 }
+
+/* Base responsive container */
+main {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 0 20px;
+}
+
+/* Adjust table for smaller screens */
+@media (max-width: 768px) {
+    h1 {
+        font-size: 2rem;
+        margin-bottom: 15px;
+    }
+
+    .input-container {
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+    }
+
+    .input-container input,
+    .calculate-btn {
+        width: 100%;
+        max-width: 300px;
+    }
+
+    /* Make table scrollable horizontally */
+    .routine-table-wrapper {
+        overflow-x: auto;
+        margin: 0 -20px;
+        padding: 0 20px;
+        -webkit-overflow-scrolling: touch;
+    }
+
+    .routine-table {
+        min-width: 500px; /* Ensure minimum width for readability */
+    }
+
+    .routine-table th,
+    .routine-table td {
+        padding: 8px 12px;
+        font-size: 0.9rem;
+    }
+}
+
+/* Additional breakpoint for very small screens */
+@media (max-width: 480px) {
+    h1 {
+        font-size: 1.75rem;
+    }
+
+    .input-container label {
+        font-size: 0.9rem;
+    }
+
+    .input-container input,
+    .calculate-btn {
+        padding: 8px 12px;
+        font-size: 0.9rem;
+    }
+}
+
+/* Add support for larger screens */
+@media (min-width: 1200px) {
+    main {
+        padding: 0 40px;
+    }
+
+    .input-container {
+        gap: 30px;
+    }
+
+    .routine-table {
+        margin: 40px auto;
+    }
+}

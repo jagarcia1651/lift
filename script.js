@@ -145,6 +145,19 @@ function init() {
     setTodayDate(new Date());
     loadProgramInfo();
     
+    // Add event listener for date changes
+    document.getElementById('today-date').addEventListener('change', () => {
+        const programStart = document.getElementById('program-start')?.value;
+        const squat1RM = document.getElementById('squat-1rm')?.value;
+        const bench1RM = document.getElementById('bench-1rm')?.value;
+        const deadlift1RM = document.getElementById('deadlift-1rm')?.value;
+        
+        if (programStart && squat1RM && bench1RM && deadlift1RM) {
+            updateWeights();
+        }
+    });
+    
+    // Initial check for auto-update
     const programStart = document.getElementById('program-start')?.value;
     const squat1RM = document.getElementById('squat-1rm')?.value;
     const bench1RM = document.getElementById('bench-1rm')?.value;

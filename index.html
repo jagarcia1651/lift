@@ -9,6 +9,7 @@
     <link rel="stylesheet" href="styles.css">
 </head>
 <body>
+    <!-- App Header -->
     <header class="app-header">
         <h1>Power Routine Calculator</h1>
         <div class="theme-switch" role="switch" aria-checked="false">
@@ -29,9 +30,11 @@
             </label>
         </div>
     </header>
-    <main>
+
+    <!-- Main Content -->
+    <main class="main-container">
         <!-- Setup View -->
-        <div id="setup-view" class="view active">
+        <section id="setup-view" class="view active">
             <form class="input-container" onsubmit="event.preventDefault();">
                 <div class="input-group">
                     <label for="today-date">Today's Date</label>
@@ -108,12 +111,12 @@
                     Start Workout
                 </button>
             </div>
-        </div>
+        </section>
 
         <!-- Workout View -->
-        <div id="workout-view" class="view">
-            <div class="timer-container">
-                <div class="timer-display">
+        <section id="workout-view" class="view">
+            <div class="timer-container" role="timer" aria-label="Workout timer">
+                <div class="timer-display" tabindex="0" role="button" aria-label="Click to pause/resume timer">
                     <span id="workout-timer">00:00:00</span>
                 </div>
             </div>
@@ -134,8 +137,9 @@
                     </button>
                 </div>
             </div>
-        </div>
+        </section>
     </main>
+
     <script src="script.js"></script>
 </body>
 </html>

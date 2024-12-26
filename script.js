@@ -134,6 +134,12 @@ function setupEventListeners() {
     // Initial update if all fields are filled
     if (areAllFieldsFilled()) {
         updateWeights();
+    } else {
+        // Disable start workout button if fields aren't filled
+        const startButton = document.getElementById('start-workout');
+        if (startButton) {
+            startButton.disabled = true;
+        }
     }
 }
 
@@ -207,6 +213,16 @@ function loadProgramInfo() {
         document.getElementById('squat-1rm').value = squat1RM;
         document.getElementById('bench-1rm').value = bench1RM;
         document.getElementById('deadlift-1rm').value = dead1RM;
+        document.getElementById('program-start').value = getFormattedDate(new Date(programStart));
+
+        // Generate preview and enable start button if all fields are filled
+        if (areAllFieldsFilled()) {
+            generateRoutinePreview();
+            const startButton = document.getElementById('start-workout');
+            if (startButton) {
+                startButton.disabled = false;
+            }
+        }
     } catch (error) {
         console.error('Error loading program info:', error);
     }
@@ -349,11 +365,67 @@ function updateWeights() {
         programInfo.bench1RM = bench1RM;
 
         saveProgramInfo();
-        generateRoutine();
+        
+        // Generate preview in setup view
+        generateRoutinePreview();
+        
+        // Enable start workout button
+        const startButton = document.getElementById('start-workout');
+        if (startButton) {
+            startButton.disabled = false;
+        }
     } catch (error) {
         alert(error.message);
         console.error('Error updating weights:', error);
     }
+}
+
+/**
+ * Generate the routine preview in setup view
+ */
+function generateRoutinePreview() {
+    const previewContainer = document.getElementById('routine-preview');
+    if (!previewContainer) return;
+
+    const programWeek = getProgramWeek();
+    if (programWeek > 9) {
+        previewContainer.innerHTML = '<h2>Program\'s over, go home.</h2>';
+        return;
+    }
+
+    const lift = getLiftOfTheDay();
+    if (lift.toLowerCase().includes('rest')) {
+        displayRestDay(previewContainer, programWeek);
+        return;
+    }
+
+    const accessories = getRotatedAccessories(lift, programWeek);
+    
+    const card = document.createElement('div');
+    card.className = 'workout-card';
+    
+    card.innerHTML = `
+        <div class="workout-header">
+            <div class="workout-meta">
+                <span>Week ${programWeek}</span>
+                <span>${getDayOfTheWeek()}</span>
+            </div>
+            <div class="primary-lift">
+                <h2>${lift}</h2>
+                <div class="lift-details">
+                    <span class="lift-detail">${getWeightOfTheDay()} lbs</span>
+                    <span class="lift-detail">${getSetsAndReps()}</span>
+                </div>
+            </div>
+        </div>
+        <div class="accessories-section">
+            <h3>Accessories</h3>
+            ${formatAccessories(accessories)}
+        </div>
+    `;
+    
+    previewContainer.innerHTML = '';
+    previewContainer.appendChild(card);
 }
 
 /**
@@ -482,4 +554,212 @@ function formatAccessories(accessories) {
             </div>
         `).join('')}
     `;
+}
+
+// -------------------------
+// Workout State
+// -------------------------
+/** @type {Object} */
+const workoutState = {
+    isActive: false,
+    startTime: null,
+    timerInterval: null,
+    sets: new Map(),
+    currentLift: null
+};
+
+/**
+ * Start the workout session
+ */
+function startWorkout() {
+    workoutState.isActive = true;
+    workoutState.startTime = new Date();
+    workoutState.currentLift = getLiftOfTheDay();
+    
+    // Switch views
+    document.getElementById('setup-view').classList.remove('active');
+    document.getElementById('workout-view').classList.add('active');
+    
+    // Initialize timer
+    startWorkoutTimer();
+    
+    // Generate workout content
+    generateWorkoutContent();
+    
+    // Setup before unload warning
+    window.addEventListener('beforeunload', handleBeforeUnload);
+}
+
+/**
+ * Handle page unload during active workout
+ * @param {BeforeUnloadEvent} e 
+ */
+function handleBeforeUnload(e) {
+    if (workoutState.isActive) {
+        e.preventDefault();
+        e.returnValue = '';
+    }
+}
+
+/**
+ * Start the workout timer
+ */
+function startWorkoutTimer() {
+    workoutState.timerInterval = setInterval(updateTimer, 1000);
+}
+
+/**
+ * Update the workout timer display
+ */
+function updateTimer() {
+    const timerDisplay = document.getElementById('workout-timer');
+    if (!timerDisplay || !workoutState.startTime) return;
+    
+    const elapsed = new Date() - workoutState.startTime;
+    const seconds = Math.floor((elapsed / 1000) % 60);
+    const minutes = Math.floor((elapsed / (1000 * 60)) % 60);
+    const hours = Math.floor(elapsed / (1000 * 60 * 60));
+    
+    timerDisplay.textContent = 
+        `${hours.toString().padStart(2, '0')}:` +
+        `${minutes.toString().padStart(2, '0')}:` +
+        `${seconds.toString().padStart(2, '0')}`;
+}
+
+/**
+ * Generate the workout content
+ */
+function generateWorkoutContent() {
+    const container = document.getElementById('workout-content');
+    if (!container) return;
+    
+    const lift = workoutState.currentLift;
+    if (lift.toLowerCase().includes('rest')) {
+        container.innerHTML = '<h2>Rest Day</h2>';
+        return;
+    }
+    
+    const weight = getWeightOfTheDay();
+    const setsReps = getSetsAndReps();
+    const [sets, reps] = setsReps.split('x').map(Number);
+    const accessories = getRotatedAccessories(lift, getProgramWeek());
+    
+    // Generate primary lift sets
+    const primarySets = Array.from({ length: sets }, (_, i) => ({
+        id: `primary-${i + 1}`,
+        type: 'primary',
+        weight,
+        reps,
+        setNumber: i + 1
+    }));
+    
+    // Generate accessory sets
+    const accessorySets = accessories.flatMap((acc, i) => {
+        const [sets, reps] = acc.setsReps.split('x');
+        return Array.from({ length: Number(sets) }, (_, j) => ({
+            id: `accessory-${i}-${j + 1}`,
+            type: 'accessory',
+            exercise: acc.exercise,
+            weight: acc.weight,
+            reps: Number(reps),
+            setNumber: j + 1
+        }));
+    });
+    
+    // Initialize sets in state
+    [...primarySets, ...accessorySets].forEach(set => {
+        workoutState.sets.set(set.id, { ...set, completed: false });
+    });
+    
+    // Render workout content
+    container.innerHTML = `
+        <div class="set-group">
+            <h3>${lift}</h3>
+            <div class="set-list">
+                ${primarySets.map(set => generateSetHTML(set)).join('')}
+            </div>
+        </div>
+        
+        <div class="set-group">
+            <h3>Accessories</h3>
+            ${accessories.map((acc, i) => `
+                <div class="accessory-group">
+                    <h4>${acc.exercise}</h4>
+                    <div class="set-list">
+                        ${Array.from({ length: Number(acc.setsReps.split('x')[0]) }, (_, j) => 
+                            generateSetHTML({
+                                id: `accessory-${i}-${j + 1}`,
+                                type: 'accessory',
+                                exercise: acc.exercise,
+                                weight: acc.weight,
+                                reps: Number(acc.setsReps.split('x')[1]),
+                                setNumber: j + 1
+                            })
+                        ).join('')}
+                    </div>
+                </div>
+            `).join('')}
+        </div>
+    `;
+    
+    // Add click handlers
+    container.querySelectorAll('.set-checkbox').forEach(checkbox => {
+        checkbox.addEventListener('click', () => toggleSet(checkbox.dataset.setId));
+    });
+}
+
+/**
+ * Generate HTML for a single set
+ * @param {Object} set 
+ * @returns {string}
+ */
+function generateSetHTML(set) {
+    return `
+        <div class="set-item">
+            <div class="set-checkbox" data-set-id="${set.id}"></div>
+            <div class="set-details">
+                <span class="set-weight">${set.weight}</span>
+                <span class="set-reps">${set.reps} reps</span>
+            </div>
+        </div>
+    `;
+}
+
+/**
+ * Toggle a set's completion status
+ * @param {string} setId 
+ */
+function toggleSet(setId) {
+    const set = workoutState.sets.get(setId);
+    if (!set) return;
+    
+    set.completed = !set.completed;
+    workoutState.sets.set(setId, set);
+    
+    const checkbox = document.querySelector(`[data-set-id="${setId}"]`);
+    if (checkbox) {
+        checkbox.classList.toggle('checked', set.completed);
+    }
+}
+
+/**
+ * Finish the workout
+ */
+function finishWorkout() {
+    if (!confirm('Are you sure you want to finish this workout?')) return;
+    
+    clearInterval(workoutState.timerInterval);
+    workoutState.isActive = false;
+    
+    // Switch back to setup view
+    document.getElementById('workout-view').classList.remove('active');
+    document.getElementById('setup-view').classList.add('active');
+    
+    // Reset workout state
+    workoutState.startTime = null;
+    workoutState.sets.clear();
+    workoutState.currentLift = null;
+    
+    // Remove unload warning
+    window.removeEventListener('beforeunload', handleBeforeUnload);
 }

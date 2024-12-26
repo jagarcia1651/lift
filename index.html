@@ -28,73 +28,111 @@
             </label>
         </div>
         
-        <h1>Power Routine Calculator</h1>
-        
-        <form class="input-container" onsubmit="event.preventDefault();">
-            <div class="input-group">
-                <label for="today-date">Today's Date</label>
-                <input 
-                    type="date" 
-                    id="today-date" 
-                    required 
-                    aria-label="Today's date"
+        <!-- Setup View -->
+        <div id="setup-view" class="view active">
+            <h1>Power Routine Calculator</h1>
+            
+            <form class="input-container" onsubmit="event.preventDefault();">
+                <div class="input-group">
+                    <label for="today-date">Today's Date</label>
+                    <input 
+                        type="date" 
+                        id="today-date" 
+                        required 
+                        aria-label="Today's date"
+                    >
+                </div>
+                <div class="input-group">
+                    <label for="program-start">Program Start Date</label>
+                    <input 
+                        type="date" 
+                        id="program-start" 
+                        required
+                        aria-label="Program start date" 
+                        value="2024-12-09"
+                    >
+                </div>
+                <div class="input-group">
+                    <label for="squat-1rm">Squat 1RM (lbs)</label>
+                    <input 
+                        type="number" 
+                        id="squat-1rm" 
+                        min="0" 
+                        required
+                        placeholder="Enter weight" 
+                        value="315"
+                    >
+                </div>
+                <div class="input-group">
+                    <label for="bench-1rm">Bench 1RM (lbs)</label>
+                    <input 
+                        type="number" 
+                        id="bench-1rm" 
+                        min="0" 
+                        required
+                        placeholder="Enter weight" 
+                        value="225"
+                    >
+                </div>
+                <div class="input-group">
+                    <label for="deadlift-1rm">Deadlift 1RM (lbs)</label>
+                    <input 
+                        type="number" 
+                        id="deadlift-1rm" 
+                        min="0" 
+                        required
+                        placeholder="Enter weight" 
+                        value="405"
+                    >
+                </div>
+                <button 
+                    type="button" 
+                    class="calculate-btn" 
+                    onclick="updateWeights()"
                 >
-            </div>
-            <div class="input-group">
-                <label for="program-start">Program Start Date</label>
-                <input 
-                    type="date" 
-                    id="program-start" 
-                    required
-                    aria-label="Program start date" 
-                    value="2024-12-09"
+                    Update Weights
+                </button>
+            </form>
+            
+            <div class="routine-container">
+                <div id="routine-preview" role="region" aria-live="polite">
+                    <!-- Dynamic preview content -->
+                </div>
+                <button 
+                    type="button" 
+                    id="start-workout" 
+                    class="start-workout-btn" 
+                    onclick="startWorkout()"
+                    disabled
                 >
+                    Start Workout
+                </button>
             </div>
-            <div class="input-group">
-                <label for="squat-1rm">Squat 1RM (lbs)</label>
-                <input 
-                    type="number" 
-                    id="squat-1rm" 
-                    min="0" 
-                    required
-                    placeholder="Enter weight" 
-                    value="315"
+        </div>
+
+        <!-- Workout View -->
+        <div id="workout-view" class="view">
+            <div class="workout-header">
+                <h1>Current Workout</h1>
+                <div class="timer-display">
+                    <span id="workout-timer">00:00:00</span>
+                </div>
+            </div>
+            
+            <div class="workout-progress">
+                <div id="workout-content">
+                    <!-- Dynamic workout content -->
+                </div>
+            </div>
+
+            <div class="workout-controls">
+                <button 
+                    type="button" 
+                    class="finish-workout-btn" 
+                    onclick="finishWorkout()"
                 >
-            </div>
-            <div class="input-group">
-                <label for="bench-1rm">Bench 1RM (lbs)</label>
-                <input 
-                    type="number" 
-                    id="bench-1rm" 
-                    min="0" 
-                    required
-                    placeholder="Enter weight" 
-                    value="225"
-                >
-            </div>
-            <div class="input-group">
-                <label for="deadlift-1rm">Deadlift 1RM (lbs)</label>
-                <input 
-                    type="number" 
-                    id="deadlift-1rm" 
-                    min="0" 
-                    required
-                    placeholder="Enter weight" 
-                    value="405"
-                >
-            </div>
-            <button 
-                type="button" 
-                class="calculate-btn" 
-                onclick="updateWeights()"
-            >
-                Update Weights
-            </button>
-        </form>
-        
-        <div class="routine-container">
-            <div id="routine-display" role="region" aria-live="polite">
-                <!-- Dynamic content will be inserted here -->
+                    Finish Workout
+                </button>
             </div>
         </div>
     </main>

@@ -252,3 +252,31 @@ main {
         margin: 40px auto;
     }
 }
+
+.accessory {
+    padding: 4px 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.accessory:last-child {
+    border-bottom: none;
+}
+
+.accessory .exercise {
+    font-weight: 600;
+    display: block;
+}
+
+.accessory .sets-reps,
+.accessory .weight {
+    font-size: 0.9em;
+    color: var(--text-color);
+    opacity: 0.8;
+    margin-right: 8px;
+}
+
+/* Adjust table for accessories */
+.routine-table td:last-child {
+    text-align: left;
+    min-width: 200px;
+}

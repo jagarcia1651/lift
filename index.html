@@ -140,6 +140,21 @@
         </section>
     </main>
 
+    <div class="modal" id="finish-modal">
+        <div class="modal-content">
+            <h3>Finish Workout?</h3>
+            <p id="finish-message">Are you sure you want to finish this workout?</p>
+            <div class="modal-actions">
+                <button type="button" class="modal-btn cancel-btn" onclick="closeModal()">
+                    Cancel
+                </button>
+                <button type="button" class="modal-btn confirm-btn" onclick="confirmFinishWorkout()">
+                    Finish
+                </button>
+            </div>
+        </div>
+    </div>
+
     <script src="script.js"></script>
 </body>
 </html>

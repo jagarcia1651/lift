@@ -292,15 +292,19 @@ function completeSet(exerciseId) {
 }
 
 function finishWorkout() {
-    if (!confirm('Are you sure you want to finish this workout?')) return;
+    const unfinishedSets = Array.from(workoutState.sets.values())
+        .filter(exercise => exercise.completedSets < exercise.totalSets);
     
-    clearInterval(workoutState.timerInterval);
-    workoutState.isActive = false;
+    const modal = document.getElementById('finish-modal');
+    const message = document.getElementById('finish-message');
     
-    switchToSetupView();
-    resetWorkoutState();
+    if (unfinishedSets.length > 0) {
+        message.textContent = `You have ${unfinishedSets.length} exercises with incomplete sets. Are you sure you want to finish this workout?`;
+    } else {
+        message.textContent = 'Are you sure you want to finish this workout?';
+    }
     
-    window.removeEventListener('beforeunload', handleBeforeUnload);
+    modal.classList.add('active');
 }
 
 // -------------------------
@@ -826,3 +830,28 @@ function isPrimaryComplete() {
     const primary = workoutState.sets.get('primary');
     return primary.completedSets === primary.totalSets;
 }
+
+// Add new functions for modal handling
+function closeModal() {
+    const modal = document.getElementById('finish-modal');
+    modal.classList.remove('active');
+}
+
+function confirmFinishWorkout() {
+    clearInterval(workoutState.timerInterval);
+    workoutState.isActive = false;
+    
+    switchToSetupView();
+    resetWorkoutState();
+    
+    window.removeEventListener('beforeunload', handleBeforeUnload);
+    closeModal();
+}
+
+// Add click outside to close
+document.addEventListener('click', (e) => {
+    const modal = document.getElementById('finish-modal');
+    if (e.target === modal) {
+        closeModal();
+    }
+});

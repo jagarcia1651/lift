@@ -323,56 +323,81 @@ function getRotatedAccessories(primaryLift, programWeek) {
 }
 
 function generateRoutine() {
-    const tableBody = document.getElementById('routine-table-body');
-    tableBody.innerHTML = '';
+    const routineDisplay = document.getElementById('routine-display');
+    routineDisplay.innerHTML = '';
     const programWeek = getProgramWeek();
-    console.log('Generating routine for week:', programWeek);
 
     if (programWeek > 9) {
         alert('Program\'s over, go home.');
-    } else {
-        const lift = getLiftOfTheDay();
-        console.log('Lift of the day:', lift);
-        const accessories = getRotatedAccessories(lift, programWeek);
-        console.log('Retrieved accessories:', accessories);
-        
-        const rowData = [
-            programWeek,
-            getDayOfTheWeek(),
-            lift,
-            getWeightOfTheDay(),
-            getSetsAndReps(),
-            formatAccessories(accessories)
-        ];
-
-        const row = document.createElement('tr');
-        rowData.forEach((text, index) => {
-            const cell = document.createElement('td');
-            if (index === 5) { // Accessories column
-                cell.innerHTML = text; // Use innerHTML for formatted accessories
-            } else {
-                cell.textContent = text;
-            }
-            row.appendChild(cell);
-        });
-        tableBody.appendChild(row);
+        return;
     }
+
+    const lift = getLiftOfTheDay();
+    if (lift.toLowerCase().includes('rest')) {
+        displayRestDay(routineDisplay, programWeek);
+        return;
+    }
+
+    const accessories = getRotatedAccessories(lift, programWeek);
+    
+    const card = document.createElement('div');
+    card.className = 'workout-card';
+    
+    card.innerHTML = `
+        <div class="workout-header">
+            <div class="workout-meta">
+                <span>Week ${programWeek}</span>
+                <span>${getDayOfTheWeek()}</span>
+            </div>
+            <div class="primary-lift">
+                <h2>${lift}</h2>
+                <div class="lift-details">
+                    <span class="lift-detail">${getWeightOfTheDay()} lbs</span>
+                    <span class="lift-detail">${getSetsAndReps()}</span>
+                </div>
+            </div>
+        </div>
+        <div class="accessories-section">
+            <h3>Accessories</h3>
+            ${formatAccessories(accessories)}
+        </div>
+    `;
+    
+    routineDisplay.appendChild(card);
+}
+
+function displayRestDay(container, week) {
+    const card = document.createElement('div');
+    card.className = 'workout-card';
+    card.innerHTML = `
+        <div class="workout-header">
+            <div class="workout-meta">
+                <span>Week ${week}</span>
+                <span>${getDayOfTheWeek()}</span>
+            </div>
+            <div class="primary-lift">
+                <h2>Rest Day</h2>
+            </div>
+        </div>
+    `;
+    container.appendChild(card);
 }
 
 function formatAccessories(accessories) {
-    console.log('Formatting accessories:', accessories);
-    if (!accessories || accessories.length === 0) {
-        console.log('No accessories to format');
-        return 'Rest';
-    }
+    if (!accessories || accessories.length === 0) return '<p>No accessories scheduled</p>';
     
-    const html = accessories.map(acc => 
-        `<div class="accessory">
-            <span class="exercise">${acc.exercise}</span>
-            <span class="sets-reps">${acc.setsReps}</span>
-            <span class="weight">${acc.weight}</span>
-        </div>`
-    ).join('');
-    console.log('Generated HTML:', html);
-    return html;
+    return `
+        <div class="accessory accessory-header">
+            <span class="exercise">Exercise</span>
+            <span class="sets-reps">Sets × Reps</span>
+            <span class="weight">Target Weight</span>
+        </div>
+        ${accessories.map(acc => `
+            <div class="accessory">
+                <span class="exercise">${acc.exercise}</span>
+                <span class="sets-reps">${acc.setsReps}</span>
+                <span class="weight">${acc.weight}</span>
+            </div>
+        `).join('')}
+    `;
 }

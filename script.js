@@ -1,9 +1,22 @@
-const liftDay = ['Rest', 'Heavy Squat', 'Light Bench', 'Deadlift', 'Light Squat', 'Heavy Bench', 'Rest'];
-const daysOfWeek = ['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday'];
+const LIFT_DAY = Object.freeze(['Rest', 'Heavy Squat', 'Light Bench', 'Deadlift', 'Light Squat', 'Heavy Bench', 'Rest']);
+const DAYS_OF_WEEK = Object.freeze(['Sunday', 'Monday', 'Tuesday', 'Wednesday', 'Thursday', 'Friday', 'Saturday']);
+const LIGHT_WORKOUT_PERCENTAGE = 0.6;
+const BASE_HEAVY_PERCENTAGE = 0.8;
+const PROGRESSION_INCREMENT = 0.05;
 
+/**
+ * @typedef {Object} ProgramInfo
+ * @property {Date} todayDate
+ * @property {Date} programStart
+ * @property {number} squat1RM
+ * @property {number} dead1RM
+ * @property {number} bench1RM
+ */
+
+/** @type {ProgramInfo} */
 const programInfo = {
     todayDate: getToday(),
-    programStart: new Date(2024, 11, 25),
+    programStart: new Date(2024, 11, 9),
     squat1RM: 0,
     dead1RM: 0,
     bench1RM: 0
@@ -14,6 +27,16 @@ init();
 function init() {
     setTodayDate(new Date());
     loadProgramInfo();  // Load saved program info from localStorage
+    
+    // Check if all fields have values
+    const programStart = document.getElementById('program-start')?.value;
+    const squat1RM = document.getElementById('squat-1rm')?.value;
+    const bench1RM = document.getElementById('bench-1rm')?.value;
+    const deadlift1RM = document.getElementById('deadlift-1rm')?.value;
+    
+    if (programStart && squat1RM && bench1RM && deadlift1RM) {
+        updateWeights();
+    }
 }
 
 function getFormattedDate(date) {
@@ -60,18 +83,18 @@ function getProgramWeek() {
 }
 
 function getDayOfTheWeek() {
-    return daysOfWeek[getToday().getDay()];
+    return DAYS_OF_WEEK[getToday().getDay()];
 }
 
 function getLiftOfTheDay() {
-    return liftDay[getToday().getDay()];
+    return LIFT_DAY[getToday().getDay()];
 }
 
 function getWeightOfTheDay() {
     const lift = getLiftOfTheDay();
     if (lift.toLowerCase().includes('rest')) return 'Rest';
 
-    const percent = lift.toLowerCase().includes('light') ? 0.6 : getHeavyProgressionPercent();
+    const percent = lift.toLowerCase().includes('light') ? LIGHT_WORKOUT_PERCENTAGE : getHeavyProgressionPercent();
     const max = lift.toLowerCase().includes('squat') ? programInfo.squat1RM :
                 lift.toLowerCase().includes('dead') ? programInfo.dead1RM :
                 programInfo.bench1RM;
@@ -85,18 +108,12 @@ function calculateFriendlyLift(max, percent) {
 
 function getHeavyProgressionPercent() {
     const programWeek = getProgramWeek();
-
-    if(programWeek < 5)
-    {
-        return (0.8).toFixed(2);
-    } else {
-
-        var loadWeek = programWeek - 4;
-
-        return (0.8 + (loadWeek * 0.05)).toFixed(2);
+    if (programWeek < 5) {
+        return BASE_HEAVY_PERCENTAGE;
     }
-
     
+    const loadWeek = programWeek - 4;
+    return Number((BASE_HEAVY_PERCENTAGE + (loadWeek * PROGRESSION_INCREMENT)).toFixed(2));
 }
 
 function getHeavyProgressionSetsAndReps() {
@@ -112,28 +129,37 @@ function getSetsAndReps() {
 }
 
 function updateWeights() {
-    const programStart = document.getElementById('program-start').value;
-    const squat1RM = parseFloat(document.getElementById('squat-1rm').value);
-    const bench1RM = parseFloat(document.getElementById('bench-1rm').value);
-    const deadlift1RM = parseFloat(document.getElementById('deadlift-1rm').value);
+    try {
+        const programStart = document.getElementById('program-start')?.value;
+        const squat1RM = parseFloat(document.getElementById('squat-1rm')?.value || '0');
+        const bench1RM = parseFloat(document.getElementById('bench-1rm')?.value || '0');
+        const deadlift1RM = parseFloat(document.getElementById('deadlift-1rm')?.value || '0');
 
-    if (programStart >= getToday()) {
-        alert('Please enter a Program Start date in the past.');
-        return;
+        if (!programStart || !squat1RM || !bench1RM || !deadlift1RM) {
+            throw new Error('Please fill in all fields');
+        }
+
+        if (programStart >= getToday()) {
+            alert('Please enter a Program Start date in the past.');
+            return;
+        }
+
+        programInfo.programStart = new Date(programStart);
+        programInfo.squat1RM = squat1RM;
+        programInfo.dead1RM = deadlift1RM;
+        programInfo.bench1RM = bench1RM;
+
+        if (isNaN(squat1RM) || isNaN(bench1RM) || isNaN(deadlift1RM)) {
+            alert('Please enter valid 1RM values.');
+            return;
+        }
+
+        saveProgramInfo();  // Save updated program info to localStorage
+        generateRoutine();
+    } catch (error) {
+        alert(error.message);
+        console.error('Error updating weights:', error);
     }
-
-    programInfo.programStart = new Date(programStart);
-    programInfo.squat1RM = squat1RM;
-    programInfo.dead1RM = deadlift1RM;
-    programInfo.bench1RM = bench1RM;
-
-    if (isNaN(squat1RM) || isNaN(bench1RM) || isNaN(deadlift1RM)) {
-        alert('Please enter valid 1RM values.');
-        return;
-    }
-
-    saveProgramInfo();  // Save updated program info to localStorage
-    generateRoutine();
 }
 
 function generateRoutine() {

@@ -7,31 +7,23 @@
  * CSS Variables & Theme Colors
  * ---------------------------- */
 :root {
-    /* Theme colors */
     --primary-color: #3b82f6;
     --primary-hover: #60a5fa;
     --secondary-color: #64748b;
     --accent-color: #0ea5e9;
     --success-color: #10b981;
-    
-    /* Typography */
     --text-primary: #334155;
     --text-secondary: #64748b;
     --text-light: #94a3b8;
-    
-    /* Layout */
     --background: #f8fafc;
     --card-bg: #ffffff;
     --border-color: #e2e8f0;
     --shadow-color: rgb(51 65 85 / 0.08);
-    
-    /* Common values */
     --header-height: 4rem;
     --border-radius: 8px;
     --transition-speed: 0.2s;
 }
 
-/* Dark theme variables */
 [data-theme="dark"] {
     --primary-color: #60a5fa;
     --primary-hover: #93c5fd;
@@ -57,31 +49,16 @@ body {
     transition: background var(--transition-speed);
 }
 
-h1, h2, h3 {
-    color: var(--text-primary);
-    margin: 0;
-}
-
-button {
-    cursor: pointer;
-    font-family: inherit;
-    border: none;
-    border-radius: var(--border-radius);
-    padding: 0.75rem 1.5rem;
-    font-size: 1rem;
-    font-weight: 500;
-    transition: var(--transition-speed);
-}
-
-button:disabled {
-    opacity: 0.5;
-    cursor: not-allowed;
+main {
+    max-width: 1000px;
+    margin: 0 auto;
+    padding: var(--header-height) 2rem 2rem;
+    position: relative;
 }
 
 /* -----------------------------
- * Layout Components
+ * Header Styles
  * ---------------------------- */
-/* Header */
 .app-header {
     position: fixed;
     top: 0;
@@ -99,35 +76,9 @@ button:disabled {
     box-sizing: border-box;
 }
 
-.app-header h1 {
-    font-size: 1.5rem;
-    font-weight: 600;
-}
-
-/* Main Container */
-.main-container {
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: var(--header-height) 2rem 2rem;
-    position: relative;
-}
-
-/* Views */
-.view {
-    display: none;
-    opacity: 0;
-    transition: opacity var(--transition-speed);
-}
-
-.view.active {
-    display: block;
-    opacity: 1;
-}
-
 /* -----------------------------
- * Feature Components
+ * Theme Switch
  * ---------------------------- */
-/* Theme Switch */
 .theme-switch {
     position: static;
 }
@@ -184,198 +135,23 @@ input:checked + .slider:before {
     transform: translateX(24px);
 }
 
-/* Timer Display */
-.timer-container {
-    position: sticky;
-    top: var(--header-height);
-    z-index: 100;
-    background: var(--background);
-    padding: 1rem 0;
-    margin: -1rem -2rem 2rem;
-    border-bottom: 1px solid var(--border-color);
-    display: flex;
-    justify-content: center;
-    backdrop-filter: blur(8px);
-    cursor: pointer;
-}
-
-.timer-display {
-    font-size: 2rem;
-    font-weight: 600;
-    font-family: monospace;
-    color: var(--text-primary);
-    cursor: pointer;
-    transition: var(--transition-speed);
-    padding: 0.5rem 1rem;
-    border-radius: var(--border-radius);
-}
-
-.timer-display.paused {
-    opacity: 0.5;
-    animation: pulse 2s ease-in-out infinite;
-}
-
-.timer-display:hover {
-    background: var(--card-bg);
-}
-
-/* Exercise List */
-.workout-content {
-    position: relative;
-    height: calc(100vh - var(--header-height) - 120px);
-    display: flex;
-    flex-direction: column;
-    margin: 0 -2rem;
-}
-
-.workout-progress {
-    flex: 1;
-    overflow-y: auto;
-    scroll-snap-type: y proximity;
-    padding: 1rem 2rem;
-    min-height: 0;
-}
-
-.exercise-row {
-    scroll-snap-align: start;
-    scroll-margin-top: calc(var(--header-height) + 80px);
-    margin-bottom: 1rem;
-    padding: 1rem;
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius);
-    cursor: pointer;
-    transition: all var(--transition-speed) cubic-bezier(0.4, 0, 0.2, 1);
-    display: flex;
-    align-items: center;
-    justify-content: space-between;
-    gap: 1rem;
-    transform: translateX(0);
-}
-
-.exercise-row:hover {
-    transform: translateX(4px);
-    box-shadow: 0 2px 4px var(--shadow-color);
-}
-
-.exercise-row.active {
-    border-color: var(--primary-color);
-    background: var(--background);
-    box-shadow: 0 0 0 1px var(--primary-color);
-}
-
-[data-theme="dark"] .exercise-row:hover,
-[data-theme="dark"] .exercise-row.active {
-    background: var(--card-bg);
-}
-
-/* Set Indicators */
-.set-mark {
-    width: 16px;
-    height: 16px;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-}
-
-.set-mark .circle {
-    width: 12px;
-    height: 12px;
-    border-radius: 50%;
-    background-color: var(--border-color);
-    transition: all var(--transition-speed) ease;
-}
-
-.set-mark.completed .circle {
-    background-color: var(--success-color) !important;
-    transform: scale(1.1);
-}
-
-/* Controls */
-.workout-controls {
-    position: sticky;
-    bottom: 0;
-    background: var(--background);
-    padding: 1rem 2rem;
-    border-top: 1px solid var(--border-color);
-    z-index: 100;
-    backdrop-filter: blur(8px);
-    margin-top: auto;
-}
-
-.finish-workout-btn {
-    width: 100%;
-    background: var(--primary-color);
-    color: white;
-    font-weight: 500;
-    padding: 1rem;
-    border-radius: var(--border-radius);
-    transition: all var(--transition-speed) ease;
-}
-
-.finish-workout-btn:hover {
-    background: var(--primary-hover);
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px var(--shadow-color);
-}
-
 /* -----------------------------
- * Media Queries
+ * Setup View
  * ---------------------------- */
-@media (max-width: 640px) {
-    :root {
-        --header-height: 3.5rem;
-    }
-
-    .app-header {
-        padding: 0.75rem 1rem;
-    }
-    
-    .app-header h1 {
-        font-size: 1.25rem;
-    }
-    
-    .main-container {
-        padding: var(--header-height) 1rem 1rem;
-    }
-    
-    .workout-content {
-        margin: 0 -1rem;
-    }
-    
-    .workout-progress {
-        padding: 1rem;
-    }
-    
-    .workout-controls {
-        padding: 0.75rem 1rem;
-    }
-    
-    .timer-display {
-        font-size: 1.5rem;
-    }
-    
-    .exercise-details {
-        flex-direction: column;
-        gap: 0.25rem;
-    }
-    
-    .exercise-progress {
-        flex-direction: column;
-        align-items: flex-end;
-    }
-    
-    .finish-workout-btn {
-        padding: 0.75rem;
-    }
+.view {
+    display: none;
 }
 
-/* Add these styles for the setup view */
+.view.active {
+    display: block;
+}
+
 .input-container {
+    max-width: 600px;
+    margin: 0 auto 2rem;
     display: flex;
     flex-direction: column;
     gap: 1rem;
-    margin-bottom: 2rem;
 }
 
 .input-group {
@@ -404,40 +180,24 @@ input:checked + .slider:before {
     border-color: var(--primary-color);
 }
 
-.calculate-btn {
-    background: var(--primary-color);
-    color: white;
-}
-
-.calculate-btn:hover {
-    background: var(--primary-hover);
-}
-
+/* Routine Preview */
 .routine-container {
+    max-width: 600px;
+    margin: 0 auto;
     background: var(--card-bg);
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
     padding: 1.5rem;
 }
 
-.start-workout-btn {
-    width: 100%;
-    margin-top: 1.5rem;
-    background: var(--success-color);
-    color: white;
-}
-
-.start-workout-btn:hover:not(:disabled) {
-    opacity: 0.9;
-}
-
-/* Exercise preview styles */
 .exercise-preview {
     margin-top: 1rem;
 }
 
 .main-lift {
     margin-bottom: 1rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid var(--border-color);
 }
 
 .accessories {
@@ -446,71 +206,10 @@ input:checked + .slider:before {
     gap: 0.5rem;
 }
 
-.accessory p {
-    color: var(--text-secondary);
-    margin: 0;
-}
-
-/* Add these exercise info styles */
-.exercise-info {
-    flex: 1;
-}
-
-.exercise-details {
-    display: flex;
-    gap: 1rem;
-    color: var(--text-secondary);
-    font-size: 0.875rem;
-}
-
-.exercise-progress {
-    display: flex;
-    align-items: center;
-    gap: 1rem;
-}
-
-.set-checkmarks {
-    display: flex;
-    gap: 0.25rem;
-}
-
-.set-progress {
-    min-width: 3rem;
-    text-align: right;
-    color: var(--text-secondary);
-}
-
-/* Add hover effect for buttons */
-.calculate-btn:hover:not(:disabled),
-.finish-workout-btn:hover:not(:disabled) {
-    transform: translateY(-1px);
-    box-shadow: 0 2px 4px var(--shadow-color);
-}
-
-/* Improve dark mode contrast */
-[data-theme="dark"] .exercise-details,
-[data-theme="dark"] .set-progress {
-    color: var(--text-light);
-}
-
-/* Add loading animation */
-@keyframes pulse {
-    0% { opacity: 1; }
-    50% { opacity: 0.5; }
-    100% { opacity: 1; }
-}
-
-.timer-display.paused {
-    opacity: 0.5;
-    animation: pulse 2s ease-in-out infinite;
-}
-
-/* Add accessory selection styles */
 .accessory {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    gap: 1rem;
     padding: 0.5rem;
     border-radius: var(--border-radius);
     transition: var(--transition-speed);
@@ -524,30 +223,11 @@ input:checked + .slider:before {
     flex: 1;
 }
 
-.change-accessory-btn {
-    padding: 0.25rem 0.5rem;
-    background: var(--card-bg);
-    border: 1px solid var(--border-color);
+.accessory-info p {
+    margin: 0;
     color: var(--text-secondary);
-    font-size: 1.25rem;
-    line-height: 1;
 }
 
-.change-accessory-btn:hover {
-    background: var(--background);
-    color: var(--primary-color);
-    border-color: var(--primary-color);
-}
-
-[data-theme="dark"] .change-accessory-btn {
-    background: var(--background);
-}
-
-[data-theme="dark"] .change-accessory-btn:hover {
-    background: var(--card-bg);
-}
-
-/* Update accessory controls styling */
 .accessory-controls {
     display: flex;
     gap: 0.5rem;
@@ -571,21 +251,10 @@ input:checked + .slider:before {
 
 .remove-accessory-btn:hover {
     background: var(--background);
-    color: #ef4444;  /* Red color for delete */
+    color: #ef4444;
     border-color: #ef4444;
 }
 
-[data-theme="dark"] .change-accessory-btn,
-[data-theme="dark"] .remove-accessory-btn {
-    background: var(--background);
-}
-
-[data-theme="dark"] .change-accessory-btn:hover,
-[data-theme="dark"] .remove-accessory-btn:hover {
-    background: var(--card-bg);
-}
-
-/* Add accessory button styling */
 .add-accessory-btn {
     width: 100%;
     margin-top: 0.5rem;
@@ -606,6 +275,51 @@ input:checked + .slider:before {
     background: var(--card-bg);
 }
 
+/* Action Buttons */
+.calculate-btn,
+.start-workout-btn {
+    width: 100%;
+    padding: 0.75rem;
+    border-radius: var(--border-radius);
+    font-weight: 500;
+    transition: all var(--transition-speed) ease;
+}
+
+.calculate-btn {
+    background: var(--primary-color);
+    color: white;
+    margin-bottom: 1rem;
+}
+
+.start-workout-btn {
+    background: var(--success-color);
+    color: white;
+    margin-top: 1.5rem;
+}
+
+.calculate-btn:hover:not(:disabled),
+.start-workout-btn:hover:not(:disabled) {
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px var(--shadow-color);
+}
+
+.calculate-btn:disabled,
+.start-workout-btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+}
+
+/* Dark mode adjustments */
+[data-theme="dark"] .change-accessory-btn,
+[data-theme="dark"] .remove-accessory-btn {
+    background: var(--background);
+}
+
+[data-theme="dark"] .change-accessory-btn:hover,
+[data-theme="dark"] .remove-accessory-btn:hover {
+    background: var(--card-bg);
+}
+
 [data-theme="dark"] .add-accessory-btn {
     background: var(--card-bg);
 }
@@ -614,7 +328,78 @@ input:checked + .slider:before {
     background: var(--background);
 }
 
-/* Primary lift styling */
+/* -----------------------------
+ * Workout View
+ * ---------------------------- */
+.workout-content {
+    position: relative;
+    height: calc(100vh - var(--header-height) - 120px);
+    display: flex;
+    flex-direction: column;
+    margin: 0 auto;
+    max-width: 600px;
+}
+
+.workout-progress {
+    flex: 1;
+    overflow-y: auto;
+    scroll-snap-type: y proximity;
+    padding: 1rem 2rem;
+    min-height: 0;
+}
+
+/* Timer Styles */
+.timer-container {
+    position: sticky;
+    top: var(--header-height);
+    z-index: 100;
+    background: var(--background);
+    padding: 1rem 0;
+    margin: -1rem -2rem 2rem;
+    border-bottom: 1px solid var(--border-color);
+    display: flex;
+    justify-content: center;
+    backdrop-filter: blur(8px);
+}
+
+.timer-display {
+    font-size: 2rem;
+    font-weight: 600;
+    font-family: monospace;
+    color: var(--text-primary);
+    cursor: pointer;
+    transition: var(--transition-speed);
+}
+
+.timer-display.paused {
+    opacity: 0.5;
+}
+
+/* Exercise Row Styles */
+.exercise-row {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    gap: 1rem;
+    padding: 1rem;
+    margin-bottom: 0.75rem;
+    background: var(--card-bg);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    transition: var(--transition-speed);
+}
+
+.exercise-row:hover {
+    transform: translateX(4px);
+}
+
+.exercise-row.active {
+    border-color: var(--primary-color);
+    background: var(--background);
+}
+
+/* Primary Exercise */
 .exercise-row.primary {
     background: var(--card-bg);
     border-width: 2px;
@@ -625,7 +410,7 @@ input:checked + .slider:before {
     color: var(--primary-color);
 }
 
-/* Accessory lift styling */
+/* Accessory Exercises */
 .exercise-row.accessory {
     opacity: 0.5;
     pointer-events: none;
@@ -652,7 +437,6 @@ input:checked + .slider:before {
     opacity: 1;
 }
 
-/* Enable accessories when primary is complete */
 .exercise-row.accessory.available {
     opacity: 1;
     pointer-events: auto;
@@ -662,7 +446,60 @@ input:checked + .slider:before {
     display: none;
 }
 
-/* Modal styles */
+/* Exercise Details */
+.exercise-info {
+    flex: 1;
+}
+
+.exercise-details {
+    display: flex;
+    gap: 1rem;
+    color: var(--text-secondary);
+    font-size: 0.875rem;
+}
+
+.exercise-progress {
+    display: flex;
+    align-items: center;
+    gap: 1rem;
+}
+
+/* Set Indicators */
+.set-checkmarks {
+    display: flex;
+    gap: 0.25rem;
+}
+
+.set-mark {
+    width: 16px;
+    height: 16px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.set-mark .circle {
+    width: 12px;
+    height: 12px;
+    border-radius: 50%;
+    background-color: var(--border-color);
+    transition: all var(--transition-speed) ease;
+}
+
+.set-mark.completed .circle {
+    background-color: var(--success-color) !important;
+    transform: scale(1.1);
+}
+
+.set-progress {
+    min-width: 3rem;
+    text-align: right;
+    color: var(--text-secondary);
+}
+
+/* -----------------------------
+ * Modal Dialog
+ * ---------------------------- */
 .modal {
     display: none;
     position: fixed;
@@ -723,4 +560,99 @@ input:checked + .slider:before {
 
 .confirm-btn:hover {
     background: var(--primary-hover);
+}
+
+/* -----------------------------
+ * Workout Controls
+ * ---------------------------- */
+.workout-controls {
+    position: sticky;
+    bottom: 0;
+    background: var(--background);
+    padding: 1rem 2rem;
+    border-top: 1px solid var(--border-color);
+    z-index: 100;
+    backdrop-filter: blur(8px);
+    margin-top: auto;
+}
+
+.finish-workout-btn {
+    width: 100%;
+    background: var(--primary-color);
+    color: white;
+    font-weight: 500;
+    padding: 1rem;
+    border-radius: var(--border-radius);
+    transition: all var(--transition-speed) ease;
+}
+
+.finish-workout-btn:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px var(--shadow-color);
+}
+
+/* -----------------------------
+ * Media Queries
+ * ---------------------------- */
+@media (max-width: 640px) {
+    :root {
+        --header-height: 3.5rem;
+    }
+
+    .app-header {
+        padding: 0.75rem 1rem;
+    }
+    
+    .app-header h1 {
+        font-size: 1.25rem;
+    }
+    
+    main {
+        padding: var(--header-height) 1rem 1rem;
+    }
+    
+    .workout-content {
+        margin: 0 -1rem;
+    }
+    
+    .workout-progress {
+        padding: 1rem;
+    }
+    
+    .workout-controls {
+        padding: 1rem;
+    }
+    
+    .timer-display {
+        font-size: 1.5rem;
+    }
+
+    .exercise-details {
+        flex-direction: column;
+        gap: 0.25rem;
+    }
+    
+    .exercise-progress {
+        flex-direction: column;
+        align-items: flex-end;
+        gap: 0.5rem;
+    }
+    
+    .modal-content {
+        margin: 1rem;
+        width: auto;
+    }
+}
+
+@media (min-width: 641px) and (max-width: 1024px) {
+    main {
+        padding: var(--header-height) 1.5rem 1.5rem;
+    }
+
+    .workout-content,
+    .routine-container,
+    .input-container {
+        max-width: 700px;
+    }
 }

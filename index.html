@@ -6,155 +6,146 @@
     <meta name="description" content="Calculate and track your power routine workouts">
     <meta name="theme-color" content="#3b82f6">
     <title>Power Routine Calculator</title>
-    <link rel="stylesheet" href="styles.css">
+    <link rel="stylesheet" href="shared/styles.css">
+    <style>
+        .landing-container {
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: flex-start;
+            padding: 4rem 2rem 2rem;
+            text-align: center;
+            gap: 2rem;
+            position: relative;
+        }
+
+        .logo {
+            font-size: 2rem;
+            font-weight: 700;
+            color: var(--primary-color);
+        }
+
+        .start-btn {
+            padding: 1rem 3rem;
+            background: var(--primary-color);
+            color: white;
+            border: none;
+            border-radius: 0.5rem;
+            font-size: 1.25rem;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.2s ease;
+        }
+
+        .start-btn:hover {
+            background: var(--primary-hover);
+            transform: translateY(-2px);
+            box-shadow: 0 4px 6px var(--shadow-color);
+        }
+
+        .reset-btn {
+            position: fixed;
+            bottom: 2rem;
+            right: 2rem;
+            padding: 0.75rem 1.5rem;
+            background: transparent;
+            color: var(--error);
+            border: 1px solid currentColor;
+            border-radius: 0.5rem;
+            font-size: 0.875rem;
+            font-weight: 500;
+            cursor: pointer;
+            transition: all 0.2s ease;
+            opacity: 0.7;
+        }
+
+        .reset-btn:hover {
+            opacity: 1;
+            background: var(--error-light);
+            transform: translateY(-1px);
+        }
+
+        @media (max-width: 640px) {
+            .landing-container {
+                padding: 3rem 1rem 1rem;
+            }
+            
+            .logo {
+                font-size: 1.5rem;
+            }
+            
+            .start-btn {
+                padding: 0.75rem 2rem;
+                font-size: 1rem;
+            }
+
+            .reset-btn {
+                bottom: 1rem;
+                right: 1rem;
+                padding: 0.5rem 1rem;
+                font-size: 0.75rem;
+            }
+        }
+    </style>
 </head>
 <body>
-    <!-- App Header -->
     <header class="app-header">
-        <h1>Power Routine Calculator</h1>
-        <div class="theme-switch" role="switch" aria-checked="false">
+        <div class="theme-switch">
             <label class="switch" for="theme-toggle">
-                <input 
-                    type="checkbox" 
-                    id="theme-toggle" 
-                    aria-label="Toggle dark mode"
-                >
-                <span class="slider" aria-hidden="true">
-                    <svg class="sun" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M12 17.5a5.5 5.5 0 1 0 0-11 5.5 5.5 0 0 0 0 11Zm0-12.5V2m0 20v-3m8.5-5h3m-20 0h3m2.122-7.378L6.5 4.5m11 11l2.122 2.122M6.5 19.5l-2.122 2.122M19.5 6.5l-2.122-2.122" stroke="currentColor" stroke-width="1.5" stroke-linecap="round"/>
-                    </svg>
-                    <svg class="moon" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
-                        <path d="M21.752 15.002A9.718 9.718 0 0 1 18 15.75c-5.385 0-9.75-4.365-9.75-9.75 0-1.33.266-2.597.748-3.752A9.753 9.753 0 0 0 3 11.25C3 16.635 7.365 21 12.75 21a9.753 9.753 0 0 0 9.002-5.998Z" stroke="currentColor" stroke-width="1.5" stroke-linecap="round" stroke-linejoin="round"/>
-                    </svg>
-                </span>
+                <input type="checkbox" id="theme-toggle" aria-label="Toggle dark mode">
+                <span class="slider"></span>
             </label>
         </div>
     </header>
-
-    <!-- Main Content -->
-    <main class="main-container">
-        <!-- Setup View -->
-        <section id="setup-view" class="view active">
-            <form class="input-container" onsubmit="event.preventDefault();">
-                <div class="input-group">
-                    <label for="today-date">Today's Date</label>
-                    <input 
-                        type="date" 
-                        id="today-date" 
-                        required 
-                        aria-label="Today's date"
-                    >
-                </div>
-                <div class="input-group">
-                    <label for="program-start">Program Start Date</label>
-                    <input 
-                        type="date" 
-                        id="program-start" 
-                        required
-                        aria-label="Program start date" 
-                        value="2024-12-09"
-                    >
-                </div>
-                <div class="input-group">
-                    <label for="squat-1rm">Squat 1RM (lbs)</label>
-                    <input 
-                        type="number" 
-                        id="squat-1rm" 
-                        min="0" 
-                        required
-                        placeholder="Enter weight" 
-                        value="315"
-                    >
-                </div>
-                <div class="input-group">
-                    <label for="bench-1rm">Bench 1RM (lbs)</label>
-                    <input 
-                        type="number" 
-                        id="bench-1rm" 
-                        min="0" 
-                        required
-                        placeholder="Enter weight" 
-                        value="225"
-                    >
-                </div>
-                <div class="input-group">
-                    <label for="deadlift-1rm">Deadlift 1RM (lbs)</label>
-                    <input 
-                        type="number" 
-                        id="deadlift-1rm" 
-                        min="0" 
-                        required
-                        placeholder="Enter weight" 
-                        value="405"
-                    >
-                </div>
-                <button 
-                    type="button" 
-                    class="calculate-btn" 
-                    onclick="updateWeights()"
-                >
-                    Update Weights
-                </button>
-            </form>
-            
-            <div class="routine-container">
-                <div id="routine-preview" role="region" aria-live="polite">
-                    <!-- Dynamic preview content -->
-                </div>
-                <button 
-                    type="button" 
-                    id="start-workout" 
-                    class="start-workout-btn" 
-                    onclick="startWorkout()"
-                    disabled
-                >
-                    Start Workout
-                </button>
-            </div>
-        </section>
-
-        <!-- Workout View -->
-        <section id="workout-view" class="view">
-            <div class="timer-container" role="timer" aria-label="Workout timer">
-                <div class="timer-display" tabindex="0" role="button" aria-label="Click to pause/resume timer">
-                    <span id="workout-timer">00:00:00</span>
-                </div>
-            </div>
-            <div class="workout-content">
-                <div class="workout-progress">
-                    <div id="workout-content">
-                        <!-- Dynamic workout content -->
-                    </div>
-                </div>
-
-                <div class="workout-controls">
-                    <button 
-                        type="button" 
-                        class="finish-workout-btn" 
-                        onclick="finishWorkout()"
-                    >
-                        Finish Workout
-                    </button>
-                </div>
-            </div>
-        </section>
+    <main class="landing-container">
+        <div class="logo">Power Routine Calculator</div>
+        <button class="start-btn" onclick="handleStart()">Start</button>
+        <div class="spacer"></div>
+        <button class="reset-btn" onclick="handleReset()">Reset Program Data</button>
     </main>
 
-    <div class="modal" id="finish-modal">
-        <div class="modal-content">
-            <h3>Finish Workout?</h3>
-            <p id="finish-message">Are you sure you want to finish this workout?</p>
-            <div class="modal-actions">
-                <button type="button" class="modal-btn cancel-btn" onclick="closeModal()">
-                    Cancel
-                </button>
-                <button type="button" class="modal-btn confirm-btn" onclick="confirmFinishWorkout()">
-                    Finish
-                </button>
-            </div>
-        </div>
-    </div>
+    <script src="shared/scripts.js"></script>
+    <script>
+        function handleStart() {
+            if (checkInitRequired()) {
+                window.location.href = './init/init.html';
+            } else {
+                window.location.href = './calendar/calendar.html';
+            }
+        }
 
-    <script src="script.js"></script>
+        function handleReset() {
+            if (confirm('Are you sure you want to reset all program data? This cannot be undone.')) {
+                // Clear all stored data
+                localStorage.removeItem('programInfo');
+                localStorage.removeItem('workoutHistory');
+                
+                // Reset state
+                state.program = {
+                    todayDate: new Date(),
+                    programStart: null,
+                    squat1RM: 0,
+                    dead1RM: 0,
+                    bench1RM: 0
+                };
+                state.workoutHistory = new Map();
+                
+                // Show feedback to user
+                alert('Program data has been reset. Click Start to set up a new program.');
+            }
+        }
+
+        function checkInitRequired() {
+            const { programStart, squat1RM, bench1RM, dead1RM } = state.program;
+            return !programStart || !squat1RM || !bench1RM || !dead1RM;
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            initializeState();
+        });
+    </script>
 </body>
 </html>

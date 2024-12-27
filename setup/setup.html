@@ -1,0 +1,73 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Calculate and track your power routine workouts">
+    <meta name="theme-color" content="#3b82f6">
+    <title>Power Routine Calculator - Setup</title>
+    <link rel="stylesheet" href="../shared/styles.css">
+    <link rel="stylesheet" href="setup.css">
+</head>
+<body>
+    <header class="app-header">
+        <div class="theme-switch">
+            <label class="switch" for="theme-toggle">
+                <input type="checkbox" id="theme-toggle" aria-label="Toggle dark mode">
+                <span class="slider"></span>
+            </label>
+        </div>
+    </header>
+    <main class="main-container" role="main" id="main-content">
+        <section id="setup-view" class="view active">
+            <div class="setup-header">
+                <h2 class="workout-date">Thursday, September 26, 2024</h2>
+                <div class="primary-lift-summary">
+                    <h3>Heavy Squat</h3>
+                    <div class="lift-stats">
+                        <span class="weight">225 lbs</span>
+                        <span class="sets">5x5</span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="accessories-container">
+                <h3>Select Accessories</h3>
+                <div class="accessory-groups">
+                    <div class="accessory-group">
+                        <h4>Recommended</h4>
+                        <div class="accessory-list" id="recommended-accessories">
+                            <!-- Populated by JavaScript -->
+                        </div>
+                    </div>
+                    
+                    <div class="accessory-group">
+                        <h4>Optional</h4>
+                        <div class="pool-selector">
+                            <button class="pool-btn active" data-pool="legs">Legs</button>
+                            <button class="pool-btn" data-pool="push">Push</button>
+                            <button class="pool-btn" data-pool="pull">Pull</button>
+                        </div>
+                        <div class="accessory-list" id="optional-accessories">
+                            <!-- Populated by JavaScript -->
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="setup-actions">
+                <button type="button" class="back-btn" onclick="handleBack()">
+                    Back to Home
+                </button>
+                <button type="button" class="start-btn" onclick="startWorkout()">
+                    Start Workout
+                </button>
+            </div>
+        </section>
+    </main>
+
+    <!-- Load scripts in correct order -->
+    <script src="../shared/scripts.js"></script>
+    <script src="setup.js"></script>
+</body>
+</html> 

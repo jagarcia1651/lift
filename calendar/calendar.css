@@ -1,0 +1,11 @@
+/* Calendar specific styles can go here if needed */
+/* Most styles are already in shared/styles.css */
+
+/* Add any overrides or specific styles */
+.app-header {
+    justify-content: space-between;
+}
+
+.program-start {
+    margin-right: auto;
+} 

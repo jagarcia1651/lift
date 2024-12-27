@@ -1,0 +1,87 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <meta name="description" content="Calculate and track your power routine workouts">
+    <meta name="theme-color" content="#3b82f6">
+    <title>Power Routine Calculator - Setup</title>
+    <link rel="stylesheet" href="../shared/styles.css">
+    <link rel="stylesheet" href="init.css">
+</head>
+<body>
+    <header class="app-header">
+        <div class="theme-switch">
+            <label class="switch" for="theme-toggle">
+                <input type="checkbox" id="theme-toggle" aria-label="Toggle dark mode">
+                <span class="slider"></span>
+            </label>
+        </div>
+    </header>
+    <main class="init-container">
+        <div class="logo">Power Routine Calculator</div>
+        <div class="form-container">
+            <h2>Program Setup</h2>
+            <form class="init-form" onsubmit="handleInitSubmit(event)">
+                <div class="input-group">
+                    <label for="program-start">Program Start Date</label>
+                    <input 
+                        type="date" 
+                        id="program-start" 
+                        name="program-start"
+                        value="2024-12-09"
+                        required
+                    >
+                </div>
+                
+                <div class="input-group">
+                    <label for="squat-1rm">Squat 1RM (lbs)</label>
+                    <input 
+                        type="number" 
+                        id="squat-1rm" 
+                        name="squat-1rm"
+                        min="0"
+                        step="5"
+                        value="315"
+                        required
+                        placeholder="Enter your squat one rep max"
+                    >
+                </div>
+                
+                <div class="input-group">
+                    <label for="bench-1rm">Bench 1RM (lbs)</label>
+                    <input 
+                        type="number" 
+                        id="bench-1rm" 
+                        name="bench-1rm"
+                        min="0"
+                        step="5"
+                        value="225"
+                        required
+                        placeholder="Enter your bench one rep max"
+                    >
+                </div>
+                
+                <div class="input-group">
+                    <label for="dead-1rm">Deadlift 1RM (lbs)</label>
+                    <input 
+                        type="number" 
+                        id="dead-1rm" 
+                        name="dead-1rm"
+                        min="0"
+                        step="5"
+                        value="405"
+                        required
+                        placeholder="Enter your deadlift one rep max"
+                    >
+                </div>
+                
+                <button type="submit" class="submit-btn">Start Program</button>
+            </form>
+        </div>
+    </main>
+
+    <script src="../shared/scripts.js"></script>
+    <script src="init.js"></script>
+</body>
+</html> 

@@ -12,9 +12,7 @@
 <body>
     <!-- Include shared header -->
     <header class="app-header">
-        <button type="button" class="home-btn" onclick="window.location.href='../index.html'" aria-label="Go to home page">
-            🏠
-        </button>
+        <button type="button" class="btn-icon home-btn" onClick="returnToHome()">🏠</button>
         <div class="theme-switch">
             <label class="switch" for="theme-toggle">
                 <input type="checkbox" id="theme-toggle" aria-label="Toggle dark mode">
@@ -27,7 +25,7 @@
     <main class="main-container">
         <section id="workout-view" class="view active">
             <div class="page-navigation">
-                <button type="button" class="nav-back" onclick="returnToSetup()">
+                <button type="button" class="btn btn-secondary back-btn" onclick="returnToSetup()">
                     <span class="back-arrow">←</span>
                     <span class="back-text">Return to Setup</span>
                 </button>
@@ -37,7 +35,7 @@
                 <div class="workout-date"></div>
                 <div class="timer-container">
                     <div class="timer-display">00:00:00</div>
-                    <button class="timer-btn">Start Timer</button>
+                    <button class="btn btn-primary timer-btn">Start Timer</button>
                 </div>
             </div>
 
@@ -76,7 +74,7 @@
             </div>
 
             <div class="workout-actions">
-                <button type="button" class="finish-btn" onclick="finishWorkout()">
+                <button type="button" class="btn btn-success finish-btn" onclick="finishWorkout()">
                     Finish Workout
                 </button>
             </div>

@@ -5,7 +5,7 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="description" content="Calculate and track your power routine workouts">
     <meta name="theme-color" content="#3b82f6">
-    <title>Power Routine Calculator - Setup</title>
+    <title>Power Routine Calculator - Configuration</title>
     <link rel="stylesheet" href="../shared/styles.css">
     <link rel="stylesheet" href="init.css">
 </head>
@@ -21,7 +21,7 @@
     <main class="init-container">
         <div class="logo">Power Routine Calculator</div>
         <div class="form-container">
-            <h2>Program Setup</h2>
+            <h2>Program Configuration</h2>
             <form class="init-form" onsubmit="handleInitSubmit(event)">
                 <div class="input-group">
                     <label for="program-start">Program Start Date</label>
@@ -73,6 +73,20 @@
                         value="405"
                         required
                         placeholder="Enter your deadlift one rep max"
+                    >
+                </div>
+                
+                <div class="input-group">
+                    <label for="rest-timer">Rest Timer (seconds)</label>
+                    <input 
+                        type="number" 
+                        id="rest-timer" 
+                        name="rest-timer"
+                        min="30"
+                        step="5"
+                        value="90"
+                        required
+                        placeholder="Enter rest time between sets"
                     >
                 </div>
                 

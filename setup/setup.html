@@ -11,9 +11,7 @@
 </head>
 <body>
     <header class="app-header">
-        <button type="button" class="home-btn" onclick="window.location.href='../index.html'" aria-label="Go to home page">
-            🏠
-        </button>
+        <button type="button" class="btn-icon home-btn" onClick="returnToHome()">🏠</button>
         <div class="theme-switch">
             <label class="switch" for="theme-toggle">
                 <input type="checkbox" id="theme-toggle" aria-label="Toggle dark mode">
@@ -40,9 +38,7 @@
                     <div class="accessory-group">
                         <div class="section-header">
                             <h3>Selected Accessories</h3>
-                            <button class="reset-btn" onclick="resetToDefault()" title="Reset to Default">
-                                ↺ Reset
-                            </button>
+                            <button class="action-btn reset-btn">↺ Reset</button>
                         </div>
                         <div class="accessory-list" id="selected-accessories">
                             <!-- Populated by JavaScript -->
@@ -53,9 +49,9 @@
                     <div class="accessory-group">
                         <h3>Add Accessories</h3>
                         <div class="pool-selector">
-                            <button class="pool-btn active" data-pool="legs">Legs</button>
-                            <button class="pool-btn" data-pool="push">Push</button>
-                            <button class="pool-btn" data-pool="pull">Pull</button>
+                            <button class="btn btn-secondary pool-btn" data-pool="legs">Legs</button>
+                            <button class="btn btn-secondary pool-btn" data-pool="push">Push</button>
+                            <button class="btn btn-secondary pool-btn" data-pool="pull">Pull</button>
                         </div>
                         <div class="accessory-list" id="optional-accessories">
                             <!-- Populated by JavaScript -->
@@ -65,12 +61,8 @@
             </div>
 
             <div class="setup-actions">
-                <button type="button" class="back-btn" onclick="handleBack()">
-                    Back to Calendar
-                </button>
-                <button type="button" class="start-btn" onclick="startWorkout()">
-                    Start Workout
-                </button>
+                <button type="button" class="btn btn-secondary" onclick="handleBack()">Back to Calendar</button>
+                <button type="button" class="btn btn-primary" onclick="startWorkout()">Start Workout</button>
             </div>
         </section>
     </main>

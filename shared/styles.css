@@ -2,67 +2,111 @@
  * CSS Variables & Theme Colors
  * ---------------------------- */
 :root {
-    --primary-color: #3b82f6;
+    /* Primary Colors */
+    --primary: #3b82f6;
     --primary-hover: #60a5fa;
-    --secondary-color: #64748b;
-    --accent-color: #0ea5e9;
-    --success-color: #10b981;
+    
+    /* Background Colors */
+    --background: #f8fafc;
+    --background-light: #f8fafc;  /* Same as --background, consolidate */
+    --background-muted: #f1f5f9;
+    
+    /* Text Colors */
     --text-primary: #334155;
     --text-secondary: #64748b;
+    --text-muted: #64748b;      /* Same as --text-secondary, consolidate */
     --text-light: #94a3b8;
-    --background: #f8fafc;
-    --card-bg: #ffffff;
-    --border-color: #e2e8f0;
-    --shadow-color: rgb(51 65 85 / 0.08);
-    --header-height: 3rem;
-    --border-radius: 8px;
-    --transition-speed: 0.2s;
+    
+    /* Status Colors */
     --success: #22c55e;
     --success-light: #86efac;
     --warning: #eab308;
     --warning-light: #fef08a;
     --error: #ef4444;
     --error-light: #fecaca;
-    --background-light: #f8fafc;
-    --background-muted: #f1f5f9;
-    --text-muted: #64748b;
-    --neutral: #94a3b8;
-    --neutral-light: #f1f5f9;
-    --dot-rest: #64748b;        /* Dark gray for rest days */
-    --dot-upcoming: #e2e8f0;    /* Light gray for not started */
-    --dot-complete: #22c55e;    /* Green for complete */
-    --dot-partial: #86efac;     /* Light green for partial */
-    --dot-missed: #fecaca;      /* Light red for missed */
-    --dot-border: #e2e8f0;      /* Border color for dots */
+    
+    /* Neutral Colors */
+    --neutral: #94a3b8;         /* Same as --text-light, consolidate */
+    --neutral-light: #f1f5f9;   /* Same as --background-muted, consolidate */
+    --border-color: #e2e8f0;
+    
+    /* Status Dots */
+    --dot-rest: #64748b;        /* Same as --text-secondary, consolidate */
+    --dot-upcoming: #e2e8f0;    /* Same as --border-color, consolidate */
+    --dot-complete: #22c55e;    /* Same as --success, consolidate */
+    --dot-partial: #86efac;     /* Same as --success-light, consolidate */
+    --dot-missed: #fecaca;      /* Same as --error-light, consolidate */
+    --dot-border: #e2e8f0;      /* Same as --border-color, consolidate */
+    
+    /* Other */
+    --shadow-color: rgb(51 65 85 / 0.08);
+    --header-height: 3rem;
+    --border-radius: 8px;
 }
 
 [data-theme="dark"] {
-    --primary-color: #60a5fa;
+    /* Primary Colors */
+    --primary: #60a5fa;
     --primary-hover: #93c5fd;
+    
+    /* Background Colors */
+    --background: #0f172a;
+    --background-light: #1e293b;
+    --background-muted: #334155;
+    
+    /* Text Colors */
     --text-primary: #f1f5f9;
     --text-secondary: #cbd5e1;
-    --text-light: #64748b;
-    --background: #0f172a;
-    --card-bg: #1e293b;
-    --border-color: #334155;
-    --shadow-color: rgb(0 0 0 / 0.3);
+    --text-muted: #94a3b8;
+    
+    /* Status Colors */
     --success: #22c55e;
     --success-light: #166534;
     --warning: #eab308;
     --warning-light: #713f12;
     --error: #ef4444;
     --error-light: #7f1d1d;
-    --background-light: #1e293b;
-    --background-muted: #334155;
-    --text-muted: #94a3b8;
+    
+    /* Neutral Colors */
     --neutral: #64748b;
-    --neutral-light: #1e293b;
-    --dot-rest: #475569;        /* Darker gray for rest days */
-    --dot-upcoming: #334155;    /* Dark gray for not started */
-    --dot-complete: #22c55e;    /* Keep same green */
-    --dot-partial: #4ade80;     /* Adjusted light green for visibility */
-    --dot-missed: #fca5a5;      /* Adjusted light red for visibility */
-    --dot-border: #334155;      /* Border color for dots */
+    --neutral-light: #1e293b;   /* Same as --background-light, consolidate */
+    --border-color: #334155;    /* Same as --background-muted, consolidate */
+    
+    /* Status Dots */
+    --dot-rest: #475569;
+    --dot-upcoming: #334155;    /* Same as --background-muted, consolidate */
+    --dot-complete: #22c55e;    /* Same as --success, consolidate */
+    --dot-partial: #4ade80;
+    --dot-missed: #fca5a5;
+    --dot-border: #334155;      /* Same as --background-muted, consolidate */
+    
+    /* Other */
+    --shadow-color: rgb(0 0 0 / 0.3);
+}
+
+[data-theme="dark"] .slider {
+    background-color: var(--background);
+}
+
+[data-theme="dark"] .slider:before {
+    background-color: var(--background-light);
+}
+
+/* Dark mode icon */
+input:checked + .slider:before {
+    content: "🌙";
+}
+
+input:checked + .slider {
+    background-color: var(--primary);
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px var(--primary);
+}
+
+input:checked + .slider:before {
+    transform: translateX(30px);
 }
 
 /* -----------------------------
@@ -71,81 +115,74 @@
 body {
     margin: 0;
     padding: 0;
+    min-height: 100vh;
     font-family: system-ui, -apple-system, sans-serif;
     background: var(--background);
     color: var(--text-primary);
     line-height: 1.5;
-    transition: background var(--transition-speed);
 }
 
-main {
-    max-width: 1000px;
-    margin: 0 auto;
-    padding: var(--header-height) 2rem 2rem;
-    position: relative;
-}
-
-/* -----------------------------
- * Header Styles
- * ---------------------------- */
+/* Header - Single definition */
 .app-header {
     position: fixed;
     top: 0;
     left: 0;
     right: 0;
-    z-index: 200;
+    height: var(--header-height);
     background: var(--background);
     padding: 0.5rem 1rem;
     border-bottom: 1px solid var(--border-color);
     display: flex;
     align-items: center;
     gap: 1rem;
+    box-sizing: border-box;
     backdrop-filter: blur(8px);
-    height: var(--header-height);
+    z-index: 1000;
+}
+
+/* Main Container */
+.main-container {
+    position: relative;
+    width: 100%;
+    max-width: 800px;
+    margin: 0 auto;
+    padding: calc(var(--header-height) + 1rem) 1.5rem 5rem;
+    min-height: calc(100vh - var(--header-height));
     box-sizing: border-box;
 }
 
-.app-header h1 {
-    margin: 0;
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: var(--text-primary);
+/* Controls (fixed bottom buttons) */
+.controls {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1rem;
+    background: var(--background);
+    border-top: 1px solid var(--border-color);
 }
 
-.program-start {
-    display: flex;
+/* Modal */
+.modal {
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
     align-items: center;
-    gap: 0.5rem;
-    font-size: 0.875rem;
+    justify-content: center;
 }
 
-.program-start label {
-    color: var(--text-muted);
+.modal.active {
+    display: flex;
 }
 
-.program-start input {
-    padding: 0.25rem 0.5rem;
-    border: 1px solid var(--border-color);
-    border-radius: 0.25rem;
-    background: var(--background-light);
-    color: var(--text-primary);
-    font-size: 0.875rem;
-    max-width: 130px;
-}
-
-.program-start input:focus {
-    outline: none;
-    border-color: var(--primary-color);
-}
-
+/* Mobile adjustments */
 @media (max-width: 640px) {
-    .program-start {
-        font-size: 0.75rem;
-    }
-    
-    .program-start input {
-        font-size: 0.75rem;
-        padding: 0.25rem;
+    .main-container {
+        padding: calc(var(--header-height) + 0.75rem) 1rem 4rem;
     }
 }
 
@@ -218,11 +255,11 @@ input:checked + .slider:before {
 }
 
 input:checked + .slider {
-    background-color: var(--primary-color);
+    background-color: var(--primary);
 }
 
 input:focus + .slider {
-    box-shadow: 0 0 1px var(--primary-color);
+    box-shadow: 0 0 1px var(--primary);
 }
 
 input:checked + .slider:before {
@@ -631,8 +668,9 @@ input:checked + .slider:before {
     background: var(--text-muted);
 }
 
-.status-dot.completed { background: var(--success); }
-.status-dot.partial { background: var(--success-light); }
+.status-dot.missed { background: var(--dot-missed); }
+.status-dot.complete { background: var(--dot-complete); }
+.status-dot.partial { background: var(--dot-partial); }
 .status-dot.not-started { background: var(--neutral); }
 .status-dot.past-incomplete { background: var(--error); }
 
@@ -1067,7 +1105,7 @@ input:checked + .slider:before {
 
 .start-btn {
     padding: 0.75rem 2rem;
-    background: var(--primary-color);
+    background: var(--primary);
     color: white;
     border: none;
     border-radius: var(--border-radius);
@@ -1120,4 +1158,131 @@ input:checked + .slider:before {
         padding: 0.5rem 1rem;
         font-size: 0.875rem;
     }
+} 
+
+/* Button Styles */
+.btn {
+    padding: 0.75rem 1.5rem;
+    border-radius: var(--border-radius);
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    font-size: 0.875rem;
+    border: 1px solid var(--border-color);
+    background: var(--background);
+    color: var(--text-primary);
+}
+
+/* Primary Button */
+.btn-primary {
+    background: var(--primary);
+    color: white;
+    border: none;
+}
+
+.btn-primary:hover {
+    background: var(--primary-hover);
+    transform: translateY(-1px);
+    box-shadow: 0 2px 4px var(--shadow-color);
+}
+
+/* Secondary Button */
+.btn-secondary {
+    background: var(--background);
+    color: var(--text-primary);
+    border: 1px solid var(--border-color);
+}
+
+.btn-secondary:hover {
+    background: var(--background-muted);
+}
+
+/* Icon Button */
+.btn-icon {
+    padding: 0.5rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background: var(--background);
+    color: var(--text-muted);
+    transition: all 0.2s ease;
+}
+
+.btn-icon:hover {
+    background: var(--background-muted);
+    color: var(--primary);
+}
+
+/* Navigation Button */
+.nav-btn {
+    padding: 0.5rem 1rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background: var(--background);
+    color: var(--text-muted);
+    font-size: 0.875rem;
+    transition: all 0.2s ease;
+}
+
+.nav-btn:hover {
+    background: var(--background-muted);
+    color: var(--primary);
+}
+
+/* Action Button (like Today, Reset, etc) */
+.action-btn {
+    padding: 0.375rem 0.75rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    background: var(--background);
+    color: var(--text-muted);
+    font-size: 0.75rem;
+    transition: all 0.2s ease;
+}
+
+.action-btn:hover {
+    background: var(--background-muted);
+    color: var(--primary);
+}
+
+/* Danger Button */
+.btn-danger {
+    background: transparent;
+    color: var(--error);
+    border: 1px solid var(--error);
+    opacity: 0.8;
+}
+
+.btn-danger:hover {
+    opacity: 1;
+    background: var(--error-light);
+}
+
+/* Success Button */
+.btn-success {
+    background: var(--success);
+    color: white;
+    border: none;
+}
+
+.btn-success:hover {
+    background: var(--success-light);
+}
+
+/* Button Sizes */
+.btn-lg {
+    padding: 1rem 2rem;
+    font-size: 1rem;
+    font-weight: 600;
+}
+
+.btn-sm {
+    padding: 0.5rem 1rem;
+    font-size: 0.75rem;
+}
+
+/* Disabled State */
+.btn:disabled {
+    opacity: 0.5;
+    cursor: not-allowed;
+    pointer-events: none;
 } 

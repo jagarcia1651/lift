@@ -66,7 +66,7 @@ function updateWorkoutStatus(date) {
     
     if (checkDate < programStart) {
         statusDot.classList.add('before-program');
-        statusText.textContent = 'Before Program';
+        statusText.textContent = 'Program Not Started';
         return;
     }
     
@@ -113,7 +113,18 @@ function updateWorkoutOverview(date) {
     const overview = document.getElementById('workout-overview');
     if (!overview) return;
     
-    // Check if program is complete first
+    // Check if date is before program start
+    const programStart = new Date(state.program.programStart);
+    programStart.setHours(0, 0, 0, 0);
+    const checkDate = new Date(date);
+    checkDate.setHours(0, 0, 0, 0);
+    
+    if (checkDate < programStart) {
+        overview.innerHTML = '<div class="program-not-started">Program Not Yet Started</div>';
+        return;
+    }
+    
+    // Check if program is complete
     if (isProgramComplete(date)) {
         overview.innerHTML = '<div class="program-over">Program Complete</div>';
         return;

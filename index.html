@@ -41,8 +41,8 @@
 
     <footer class="controls">
         <div class="button-container">
-            <button class="start-btn" onclick="handleStart()">Start Program</button>
-            <button class="reset-btn" onclick="showResetConfirmation()">Reset Program Data</button>
+            <button class="btn btn-primary btn-lg" onclick="handleStart()">Start Program</button>
+            <button class="btn btn-danger" onclick="showResetConfirmation()">Reset Program Data</button>
         </div>
     </footer>
 
@@ -52,12 +52,8 @@
             <h3>Reset Program</h3>
             <p>This will clear all program data including your progress and workout history. Are you sure?</p>
             <div class="modal-actions">
-                <button type="button" class="cancel-btn" onclick="closeResetModal()">
-                    Cancel
-                </button>
-                <button type="button" class="confirm-btn danger" onclick="confirmReset()">
-                    Reset Program
-                </button>
+                <button type="button" class="btn btn-secondary" onclick="closeResetModal()">Cancel</button>
+                <button type="button" class="btn btn-danger" onclick="confirmReset()">Reset Program</button>
             </div>
         </div>
     </div>

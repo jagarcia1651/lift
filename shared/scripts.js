@@ -87,55 +87,33 @@ const ACCESSORY_POOLS = {
 window.state = {
     program: {
         todayDate: new Date(),
-        programStart: new Date(),  // Default to today, will be updated from storage
+        programStart: new Date(),
         squat1RM: 0,
         dead1RM: 0,
-        bench1RM: 0
+        bench1RM: 0,
+        restTimer: 90  // Default 90 seconds
     },
     workout: {
         isActive: false,
         startTime: null,
         timerInterval: null,
+        restStartTime: null,
+        restInterval: null,
         sets: new Map(),
         currentLift: null,
         timerPaused: false,
         pausedTime: null,
         totalPausedTime: 0
     },
-    workoutHistory: new Map() // Key: date string (YYYY-MM-DD), Value: workout data
+    workoutHistory: new Map(), // Key: date string (YYYY-MM-DD), Value: workout data
+    savedWorkouts: new Map()   // Key: date string (YYYY-MM-DD), Value: workout setup & progress
 };
 
 // Add state initialization function
 function initializeState() {
-    try {
-        const savedProgramInfo = localStorage.getItem('programInfo');
-        if (savedProgramInfo) {
-            const { squat1RM, dead1RM, bench1RM, programStart } = JSON.parse(savedProgramInfo);
-            
-            // Create date object and adjust for timezone
-            const startDate = new Date(programStart);
-            startDate.setMinutes(startDate.getMinutes() + startDate.getTimezoneOffset());
-            
-            state.program = {
-                ...state.program,
-                squat1RM: squat1RM || 0,
-                dead1RM: dead1RM || 0,
-                bench1RM: bench1RM || 0,
-                programStart: startDate || new Date()
-            };
-        } else {
-            // Set default program start if no saved data
-            const defaultDate = new Date();
-            defaultDate.setMinutes(defaultDate.getMinutes() + defaultDate.getTimezoneOffset());
-            state.program.programStart = defaultDate;
-        }
-    } catch (error) {
-        console.error('Error initializing state:', error);
-        // Use default program start on error
-        const defaultDate = new Date();
-        defaultDate.setMinutes(defaultDate.getMinutes() + defaultDate.getTimezoneOffset());
-        state.program.programStart = defaultDate;
-    }
+    loadProgramInfo();
+    loadWorkoutHistory();
+    loadSavedWorkouts();
 }
 
 // Initialize state when the script loads
@@ -423,6 +401,11 @@ function loadView(page) {
         });
 }
 
+function returnToHome() {
+
+    window.location.href = '../index.html';
+}
+
 // Helper function for backward compatibility
 function navigateTo(page) {
     loadView(page);
@@ -644,4 +627,73 @@ function confirmReset() {
 
 function roundWeight(weight) {
     return Math.round(weight / 5) * 5;
+} 
+
+// Add helper function to save workout state
+function saveWorkoutState(date) {
+    const dateKey = getFormattedDate(date);
+    const workoutState = {
+        setup: JSON.parse(localStorage.getItem('workoutSetup') || '{}'),
+        progress: {
+            primaryLift: {
+                name: document.querySelector('.primary .lift-name')?.textContent,
+                completed: parseInt(document.querySelector('.primary .sets-completed')?.textContent || '0'),
+                total: parseInt(document.querySelector('.primary .sets-total')?.textContent || '0')
+            },
+            accessories: Array.from(document.querySelectorAll('#accessories-list .exercise-row') || []).map(row => ({
+                name: row.querySelector('h4')?.textContent,
+                completed: parseInt(row.querySelector('.sets-completed')?.textContent || '0'),
+                total: parseInt(row.querySelector('.sets-total')?.textContent || '0')
+            }))
+        }
+    };
+    
+    state.savedWorkouts.set(dateKey, workoutState);
+    localStorage.setItem('savedWorkouts', JSON.stringify(Array.from(state.savedWorkouts.entries())));
+}
+
+// Add helper function to load saved workouts
+function loadSavedWorkouts() {
+    try {
+        const saved = localStorage.getItem('savedWorkouts');
+        if (saved) {
+            state.savedWorkouts = new Map(JSON.parse(saved));
+        }
+    } catch (error) {
+        console.error('Error loading saved workouts:', error);
+    }
+} 
+
+// Add this function to the state management section
+function loadProgramInfo() {
+    try {
+        const savedProgramInfo = localStorage.getItem('programInfo');
+        if (savedProgramInfo) {
+            const { squat1RM, dead1RM, bench1RM, programStart, restTimer } = JSON.parse(savedProgramInfo);
+            
+            // Create date object and adjust for timezone
+            const startDate = new Date(programStart);
+            startDate.setMinutes(startDate.getMinutes() + startDate.getTimezoneOffset());
+            
+            state.program = {
+                ...state.program,
+                squat1RM: squat1RM || 0,
+                dead1RM: dead1RM || 0,
+                bench1RM: bench1RM || 0,
+                restTimer: restTimer || 90,
+                programStart: startDate || new Date()
+            };
+        } else {
+            // Set default program start if no saved data
+            const defaultDate = new Date();
+            defaultDate.setMinutes(defaultDate.getMinutes() + defaultDate.getTimezoneOffset());
+            state.program.programStart = defaultDate;
+        }
+    } catch (error) {
+        console.error('Error loading program info:', error);
+        // Use default program start on error
+        const defaultDate = new Date();
+        defaultDate.setMinutes(defaultDate.getMinutes() + defaultDate.getTimezoneOffset());
+        state.program.programStart = defaultDate;
+    }
 } 

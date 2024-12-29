@@ -1,11 +1,11 @@
-/* Calendar Layout */
+/* Base styles (mobile first) */
 .main-container {
     display: flex;
     flex-direction: column;
-    gap: 1rem;
-    max-width: 800px;
-    margin: 0 auto;
-    padding: calc(var(--header-height) + 1rem) 1.5rem 1.5rem;
+    gap: 0.75rem;
+    width: 100%;
+    box-sizing: border-box;
+    padding: calc(var(--header-height) + 0.75rem) 0.75rem 4rem;
 }
 
 /* Component shared styles */
@@ -15,9 +15,10 @@
 .simple-calendar,
 .workout-status,
 .workout-overview {
+    width: 100%;
+    box-sizing: border-box;
     background: var(--background-light);
     border-radius: var(--border-radius);
-    padding: 1rem;
 }
 
 /* Status Legend */
@@ -25,28 +26,27 @@
     display: flex;
     justify-content: center;
     flex-wrap: wrap;
-    gap: 0.75rem;
-    padding: 0.75rem;
-    background: var(--background-light);
-    border-radius: var(--border-radius);
+    gap: 0.375rem;
+    padding: 0.5rem;
 }
 
 .legend-item {
-    display: flex;
-    align-items: center;
-    gap: 0.375rem;
-    font-size: 0.75rem;
-    color: var(--text-muted);
+    font-size: 0.675rem;
+    gap: 0.25rem;
+}
+
+.color-dot {
+    width: 0.5rem;
+    height: 0.5rem;
 }
 
 /* Weekly Schedule */
 .weekly-schedule {
     display: grid;
     grid-template-columns: repeat(5, 1fr);
-    gap: 0.75rem;
+    gap: 0.375rem;
     padding: 0.75rem;
-    background: var(--background-light);
-    border-radius: var(--border-radius);
+    overflow: hidden; /* Prevent content from overflowing */
 }
 
 .schedule-day {
@@ -57,243 +57,221 @@
     gap: 0.25rem;
 }
 
-.day-label {
-    font-weight: 500;
-    color: var(--text-muted);
-    font-size: 0.75rem;
+.day-label, .day-lift {
+    font-size: 0.675rem;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
 }
 
-.day-lift {
-    font-size: 0.75rem;
-    color: var(--text-primary);
+/* Calendar Container */
+.calendar-container {
+    width: 100%;
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    box-sizing: border-box;
 }
 
 /* Date Navigation */
 .date-navigation {
     display: flex;
     align-items: center;
-    gap: 1rem;
-    padding: 1rem;
-    background: var(--background-light);
-    border-radius: var(--border-radius);
+    gap: 0.75rem;
+    padding: 0.75rem;
+    overflow: hidden; /* Prevent content from overflowing */
 }
 
 .nav-btn {
-    padding: 0.5rem 1rem;
+    flex-shrink: 0;  /* Prevent arrows from shrinking */
+    padding: 0.375rem 0.75rem;
+    font-size: 0.75rem;
+    background: var(--background);
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
-    background: var(--background);
     color: var(--text-muted);
     cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.nav-btn:hover {
-    color: var(--primary-color);
-    background: var(--background-muted);
 }
 
 .date-display {
     flex: 1;
+    min-width: 0; /* Allow content to shrink */
     display: flex;
     flex-direction: column;
     align-items: center;
-    gap: 0.5rem;
+    min-height: 4rem;
+    padding-top: 1.75rem;
+    position: relative;
 }
 
 .today-btn {
-    padding: 0.25rem 0.75rem;
-    font-size: 0.75rem;
-    color: var(--text-muted);
+    position: absolute;
+    top: 0;
+    left: 50%;
+    transform: translateX(-50%);
+    white-space: nowrap;  /* Keep button text on one line */
+    padding: 0.25rem 0.5rem;
+    font-size: 0.675rem;
     background: var(--background);
     border: 1px solid var(--border-color);
     border-radius: var(--border-radius);
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.today-btn:hover {
-    color: var(--primary-color);
-    background: var(--background-muted);
 }
 
 .selected-date {
+    font-size: 0.875rem;
+    text-align: center;
     margin: 0;
-    font-size: 1.25rem;
-    font-weight: 600;
-    color: var(--text-primary);
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    width: 100%;
 }
 
 .workout-type {
-    color: var(--text-muted);
-    font-size: 0.875rem;
+    font-size: 0.75rem;
+    text-align: center;
 }
 
 /* Calendar Grid */
 .simple-calendar {
     display: grid;
     grid-template-columns: repeat(7, 1fr);
-    gap: 0.375rem;
-    padding: 1rem;
-    background: var(--background-light);
-    border-radius: var(--border-radius);
+    gap: 0.25rem;
+    padding: 0.75rem;
+    overflow: hidden; /* Prevent content from overflowing */
 }
 
 .calendar-day {
-    aspect-ratio: 1;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    font-size: 0.875rem;
-    background: var(--background);
-    border: 1px solid var(--border-color);
-    border-radius: var(--border-radius);
-    cursor: pointer;
-    transition: all 0.2s ease;
+    font-size: 0.75rem;
 }
 
-.calendar-day.empty {
-    background: var(--background-light);
-    border-color: transparent;
-    cursor: default;
-}
-
-.calendar-day:hover:not(.empty) {
-    background: var(--background-muted);
-}
-
-.calendar-day.selected {
-    border-color: var(--primary-color);
-    color: var(--primary-color);
-}
-
-/* Status Styles */
-.workout-status {
-    padding: 1rem;
-    background: var(--background-light);
-    border-radius: var(--border-radius);
+/* Status and Overview */
+.workout-status,
+.workout-overview {
+    padding: 0.75rem;
 }
 
 .status-indicator {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    gap: 0.5rem;
-    font-size: 0.875rem;
-    color: var(--text-primary);
-}
-
-/* Workout Overview */
-.workout-overview {
-    padding: 1rem;
-    background: var(--background-light);
-    border-radius: var(--border-radius);
+    font-size: 0.75rem;
 }
 
 .lift-details {
-    display: grid;
-    grid-template-columns: repeat(3, 1fr);
-    gap: 1rem;
-    text-align: center;
-    margin-bottom: 1rem;
-    font-size: 0.875rem;
-    color: var(--text-primary);
+    font-size: 0.75rem;
+    gap: 0.5rem;
 }
 
-.setup-btn {
-    width: 100%;
-    padding: 0.75rem;
-    background: var(--primary-color);
-    color: white;
-    border: none;
-    border-radius: var(--border-radius);
-    font-weight: 500;
-    cursor: pointer;
-    transition: all 0.2s ease;
-}
-
-.setup-btn:hover {
-    background: var(--primary-hover);
-}
-
-/* Mobile Optimizations */
-@media (max-width: 640px) {
+/* Tablet and up */
+@media (min-width: 641px) {
     .main-container {
-        gap: 0.5rem;
-        padding: calc(var(--header-height) + 0.5rem) 0.75rem 0.75rem;
+        max-width: 800px;
+        margin: 0 auto;
+        gap: 1rem;
+        padding: calc(var(--header-height) + 1rem) 1.5rem 5rem;
     }
 
-    /* More compact status legend */
     .status-legend {
-        padding: 0.375rem;
-        gap: 0.375rem;
+        gap: 0.75rem;
+        padding: 0.75rem;
     }
 
     .legend-item {
-        font-size: 0.625rem;
-        gap: 0.25rem;
-    }
-
-    /* Smaller weekly schedule */
-    .weekly-schedule {
-        padding: 0.5rem;
+        font-size: 0.75rem;
         gap: 0.375rem;
     }
 
-    .day-label, .day-lift {
-        font-size: 0.625rem;
+    .color-dot {
+        width: 0.625rem;
+        height: 0.625rem;
     }
 
-    /* Compact date navigation */
+    .weekly-schedule {
+        gap: 0.75rem;
+        padding: 1rem;
+    }
+
+    .day-label, .day-lift {
+        font-size: 0.75rem;
+    }
+
     .date-navigation {
-        padding: 0.5rem;
+        padding: 1rem;
+        gap: 1rem;
     }
 
     .nav-btn {
-        padding: 0.375rem 0.75rem;
-    }
-
-    .selected-date {
+        padding: 0.5rem 1rem;
         font-size: 0.875rem;
     }
 
-    .workout-type {
-        font-size: 0.75rem;
+    .date-display {
+        min-height: 5rem;
+        padding-top: 2rem;
     }
 
     .today-btn {
-        padding: 0.25rem 0.5rem;
-        font-size: 0.675rem;
+        padding: 0.25rem 0.75rem;
+        font-size: 0.75rem;
     }
 
-    /* Smaller calendar */
+    .selected-date {
+        font-size: 1.25rem;
+    }
+
+    .workout-type {
+        font-size: 0.875rem;
+    }
+
     .simple-calendar {
-        padding: 0.5rem;
-        gap: 0.25rem;
+        gap: 0.375rem;
+        padding: 1rem;
     }
 
     .calendar-day {
-        font-size: 0.75rem;
+        font-size: 0.875rem;
     }
 
-    /* Compact status and overview */
     .workout-status,
     .workout-overview {
-        padding: 0.5rem;
+        padding: 1rem;
     }
 
     .status-indicator {
-        font-size: 0.75rem;
+        font-size: 0.875rem;
     }
 
     .lift-details {
-        font-size: 0.75rem;
-        gap: 0.5rem;
-        margin-bottom: 0.5rem;
-    }
-
-    .setup-btn {
-        padding: 0.5rem;
         font-size: 0.875rem;
+        gap: 1rem;
     }
+} 
+
+/* Add to existing styles */
+.program-not-started {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 1rem;
+    font-size: 1.125rem;
+    font-weight: 500;
+}
+
+.status-dot.before-program {
+    background: var(--text-muted);
+}
+
+/* Update calendar day styles */
+.calendar-day.before-program {
+    background: var(--text-muted);
+    opacity: 0.5;
+    cursor: default;
+}
+
+.calendar-day.before-program:hover {
+    background: var(--text-muted);
+    transform: none;
+} 
+
+/* Update header z-index */
+.app-header {
+    z-index: 200;
 } 

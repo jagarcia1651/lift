@@ -21,34 +21,39 @@ function initializeWorkoutPage() {
         state.program.todayDate = new Date(workoutSetup.selectedDate);
     }
     
+    // Check if this is a new workout or resuming an existing one
+    const isNewWorkout = !workoutSetup.startTime || 
+        !isSameDay(new Date(workoutSetup.selectedDate), new Date(workoutSetup.startTime));
+    
     // Initialize workout state
     state.workout = {
-        startTime: workoutSetup.startTime ? new Date(workoutSetup.startTime) : null,
+        startTime: isNewWorkout ? new Date() : new Date(workoutSetup.startTime),
         timerInterval: null,
-        timerPaused: workoutSetup.timerPaused || false,
+        timerPaused: isNewWorkout ? false : (workoutSetup.timerPaused || false),
         pausedTime: workoutSetup.pausedTime ? new Date(workoutSetup.pausedTime) : null,
-        totalPausedTime: workoutSetup.totalPausedTime || 0,
-        accessories: workoutSetup.selectedAccessories || []
+        totalPausedTime: isNewWorkout ? 0 : (workoutSetup.totalPausedTime || 0),
+        accessories: workoutSetup.selectedAccessories || [],
+        restStartTime: null,
+        restInterval: null
     };
     
     updateHeaderInfo();
     setupPrimaryLift();
     setupAccessories();
     setupEventListeners();
+    setupRestTimer();
     
-    // Initialize timer display
+    // Start the workout timer
     const timerDisplay = document.querySelector('.timer-display');
     const timerBtn = document.querySelector('.timer-btn');
     
-    if (state.workout.startTime) {
-        updateTimer();
-        timerBtn.textContent = state.workout.timerPaused ? 'Resume Timer' : 'Pause Timer';
-        if (!state.workout.timerPaused) {
-            state.workout.timerInterval = setInterval(updateTimer, 1000);
-        }
+    updateTimer(); // Update display immediately
+    
+    if (!state.workout.timerPaused) {
+        state.workout.timerInterval = setInterval(updateTimer, 1000);
+        timerBtn.textContent = 'Pause Timer';
     } else {
-        timerDisplay.textContent = '00:00:00';
-        timerBtn.textContent = 'Start Timer';
+        timerBtn.textContent = 'Resume Timer';
     }
 }
 
@@ -77,13 +82,7 @@ function toggleTimer() {
     const timerBtn = document.querySelector('.timer-btn');
     const timerDisplay = document.querySelector('.timer-display');
     
-    if (!state.workout.startTime) {
-        // Start timer
-        state.workout.startTime = new Date();
-        state.workout.timerInterval = setInterval(updateTimer, 1000);
-        timerBtn.textContent = 'Pause Timer';
-        timerDisplay.classList.remove('paused');
-    } else if (state.workout.timerPaused) {
+    if (state.workout.timerPaused) {
         // Resume timer
         state.workout.timerPaused = false;
         state.workout.totalPausedTime += (new Date() - state.workout.pausedTime);
@@ -163,6 +162,35 @@ function generateSetCheckmarks(completed, total) {
 }
 
 function completeSet(exerciseId) {
+    // Check if trying to complete accessory before primary
+    if (exerciseId.startsWith('accessory')) {
+        const primaryRow = document.querySelector('.exercise-row.primary');
+        const primaryCompleted = parseInt(primaryRow.querySelector('.sets-completed').textContent);
+        const primaryTotal = parseInt(primaryRow.querySelector('.sets-total').textContent);
+        
+        if (primaryCompleted < primaryTotal) {
+            // Show error message
+            const message = document.createElement('div');
+            message.className = 'error-message';
+            message.textContent = 'Complete all primary lift sets first';
+            message.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: var(--error);
+                color: white;
+                padding: 1rem;
+                border-radius: var(--border-radius);
+                z-index: 1000;
+                animation: fadeOut 2s forwards;
+            `;
+            document.body.appendChild(message);
+            setTimeout(() => message.remove(), 2000);
+            return;
+        }
+    }
+    
     const row = document.querySelector(`[data-exercise-id="${exerciseId}"]`);
     if (!row) return;
     
@@ -181,6 +209,43 @@ function completeSet(exerciseId) {
         if (exerciseId === 'primary') {
             workoutState.primaryComplete = newCompleted === total;
         }
+        
+        // Start rest timer after completing a set, passing the exerciseId
+        startRestTimer(exerciseId);
+        
+        // Check if all sets are complete after this update
+        if (isWorkoutComplete()) {
+            // Stop both timers
+            clearInterval(state.workout.timerInterval);
+            clearInterval(state.workout.restInterval);
+            
+            // Update UI
+            const timerBtn = document.querySelector('.timer-btn');
+            timerBtn.textContent = 'Workout Complete';
+            timerBtn.disabled = true;
+            
+            // Show completion message
+            const message = document.createElement('div');
+            message.className = 'success-message';
+            message.textContent = 'All sets completed! 💪';
+            message.style.cssText = `
+                position: fixed;
+                top: 50%;
+                left: 50%;
+                transform: translate(-50%, -50%);
+                background: var(--success);
+                color: white;
+                padding: 1rem;
+                border-radius: var(--border-radius);
+                z-index: 1000;
+                animation: fadeOut 3s forwards;
+            `;
+            document.body.appendChild(message);
+            setTimeout(() => message.remove(), 3000);
+        }
+        
+        // Save workout state after set completion
+        saveWorkoutState(state.program.todayDate);
     }
 }
 
@@ -288,11 +353,120 @@ function returnToSetup() {
         totalPausedTime: state.workout.totalPausedTime
     };
     
+    // Save workout state before returning
+    saveWorkoutState(state.program.todayDate);
+    
     localStorage.setItem('workoutSetup', JSON.stringify(workoutSetup));
     window.location.href = '../setup/setup.html';
+}
+
+function setupRestTimer() {
+    const timerContainer = document.querySelector('.timer-container');
+    if (!timerContainer.querySelector('.rest-timer-container')) {  // Check if it doesn't exist first
+        const restTimerHtml = `
+            <div class="rest-timer-container">
+                <div class="rest-timer-display">Rest: --:--</div>
+            </div>
+        `;
+        timerContainer.insertAdjacentHTML('beforeend', restTimerHtml);
+    }
+}
+
+function startRestTimer(exerciseId) {
+    clearInterval(state.workout.restInterval);
+    state.workout.restStartTime = new Date();
+    
+    // Add extra minute only for heavy primary lifts
+    if (isPrimaryLift(exerciseId) && isHeavyLift()) {
+        state.program.currentRestTime = state.program.restTimer + 60; // Add 60 seconds for heavy primary lifts
+    } else {
+        state.program.currentRestTime = state.program.restTimer; // Use default rest time for accessories
+    }
+    
+    updateRestTimer();
+    state.workout.restInterval = setInterval(updateRestTimer, 1000);
+}
+
+function updateRestTimer() {
+    if (!state.workout.restStartTime) return;
+    
+    const elapsed = new Date() - state.workout.restStartTime;
+    const remaining = (state.program.currentRestTime * 1000) - elapsed;
+    
+    if (remaining <= 0) {
+        clearInterval(state.workout.restInterval);
+        state.workout.restStartTime = null;
+        const restDisplay = document.querySelector('.rest-timer-display');
+        restDisplay.textContent = 'Rest: Ready!';
+        restDisplay.classList.add('ready');
+        return;
+    }
+    
+    const seconds = Math.ceil(remaining / 1000);
+    const minutes = Math.floor(seconds / 60);
+    const remainingSeconds = seconds % 60;
+    
+    document.querySelector('.rest-timer-display').textContent = 
+        `Rest: ${minutes}:${remainingSeconds.toString().padStart(2, '0')}`;
+}
+
+// Add this function to handle page unload
+function handleBeforeUnload(event) {
+    if (state.workout.startTime && !state.workout.timerPaused) {
+        // Save current workout state
+        const workoutSetup = {
+            selectedDate: state.program.todayDate,
+            selectedAccessories: state.workout.accessories,
+            startTime: state.workout.startTime,
+            timerPaused: true,
+            pausedTime: new Date(),
+            totalPausedTime: state.workout.totalPausedTime
+        };
+        localStorage.setItem('workoutSetup', JSON.stringify(workoutSetup));
+        
+        // Save workout state before unload
+        saveWorkoutState(state.program.todayDate);
+    }
 }
 
 // Update initialization to check for saved workout state
 document.addEventListener('DOMContentLoaded', () => {
     initializeWorkoutPage();
-}); 
+});
+
+// Add helper function to check if current lift is heavy
+function isHeavyLift() {
+    const liftName = document.querySelector('.primary .lift-name').textContent;
+    return liftName.toLowerCase().includes('heavy');
+}
+
+// Add helper function to check if all sets are complete
+function isWorkoutComplete() {
+    // Check primary lift
+    const primary = document.querySelector('.exercise-row.primary');
+    const primaryCompleted = parseInt(primary.querySelector('.sets-completed').textContent);
+    const primaryTotal = parseInt(primary.querySelector('.sets-total').textContent);
+    if (primaryCompleted < primaryTotal) return false;
+    
+    // Check accessories
+    const accessories = document.querySelectorAll('#accessories-list .exercise-row');
+    for (const row of accessories) {
+        const completed = parseInt(row.querySelector('.sets-completed').textContent);
+        const total = parseInt(row.querySelector('.sets-total').textContent);
+        if (completed < total) return false;
+    }
+    
+    return true;
+}
+
+// Helper function to check if two dates are the same day
+function isSameDay(date1, date2) {
+    return date1.getFullYear() === date2.getFullYear() &&
+           date1.getMonth() === date2.getMonth() &&
+           date1.getDate() === date2.getDate();
+}
+
+// Add helper function to check if we're completing a primary lift set
+function isPrimaryLift(exerciseId) {
+    return exerciseId === 'primary';
+}

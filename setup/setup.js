@@ -23,8 +23,6 @@ function loadProgramInfo() {
         } else {
             setTodayDate(new Date());
         }
-
-        updateInputFields();
         
         if (areAllFieldsFilled()) {
             generateRoutinePreview();
@@ -79,10 +77,23 @@ const setupState = {
 // Page Initialization
 // -------------------------
 function initializeSetupPage() {
-    updateHeaderInfo();
-    loadRecommendedAccessories();
-    loadOptionalAccessories();
-    setupEventListeners();
+    try {
+        updateHeaderInfo();
+        
+        // Load saved workout state if it exists
+        const dateKey = getFormattedDate(state.program.todayDate);
+        const savedWorkout = state.savedWorkouts.get(dateKey);
+        
+        if (savedWorkout?.setup) {
+            localStorage.setItem('workoutSetup', JSON.stringify(savedWorkout.setup));
+        }
+        
+        loadRecommendedAccessories();
+        loadOptionalAccessories();
+        setupEventListeners();
+    } catch (error) {
+        console.error('Error initializing setup page:', error);
+    }
 }
 
 function updateHeaderInfo() {
@@ -111,22 +122,17 @@ function loadRecommendedAccessories() {
 
 function updateSelectedAccessories() {
     const container = document.getElementById('selected-accessories');
+    if (!container) return;
     
-    container.innerHTML = setupState.selectedAccessories.map((exercise, index) => `
-        <div class="accessory-item" data-index="${index}">
+    container.innerHTML = setupState.selectedAccessories.map((acc, index) => `
+        <div class="accessory-item">
             <div class="accessory-info">
-                <h5>${exercise.exercise}</h5>
-                <div class="accessory-details">
-                    ${exercise.setsReps} @ ${exercise.weight}
-                </div>
+                <h5>${acc.exercise}</h5>
+                <p>${acc.setsReps} @ ${acc.weight}</p>
             </div>
             <div class="accessory-controls">
-                <button class="accessory-btn swap" onclick="swapExercise(${index})" title="Swap Exercise">
-                    🔄
-                </button>
-                <button class="accessory-btn remove" onclick="removeAccessory(${index})" title="Remove Exercise">
-                    ✕
-                </button>
+                <button class="action-btn" onclick="swapExercise(${index})" title="Swap Exercise">↻</button>
+                <button class="action-btn remove" onclick="removeAccessory(${index})" title="Remove Exercise">×</button>
             </div>
         </div>
     `).join('');
@@ -198,6 +204,12 @@ function setupEventListeners() {
             loadOptionalAccessories();
         });
     });
+
+    // Reset button
+    const resetBtn = document.querySelector('.reset-btn');
+    if (resetBtn) {
+        resetBtn.addEventListener('click', resetToDefault);
+    }
 }
 
 function startWorkout() {
@@ -220,14 +232,18 @@ function handleBack() {
 
 // Initialize page
 document.addEventListener('DOMContentLoaded', () => {
-    // First check for calendar selected date
+    // First initialize state
+    initializeState();
+    initTheme();
+    
+    // Check for calendar selected date
     const selectedDate = localStorage.getItem('selectedWorkoutDate');
     if (selectedDate) {
         state.program.todayDate = new Date(selectedDate);
         localStorage.removeItem('selectedWorkoutDate');
     }
     
-    // Then check for workout setup (this will override calendar date if coming back from workout)
+    // Check for workout setup
     const workoutSetup = JSON.parse(localStorage.getItem('workoutSetup') || '{}');
     
     if (workoutSetup.selectedDate) {
@@ -241,13 +257,15 @@ document.addEventListener('DOMContentLoaded', () => {
     // Preserve workout state if exists
     if (workoutSetup.startTime) {
         state.workout = {
-            startTime: workoutSetup.startTime,
+            ...state.workout,
+            startTime: new Date(workoutSetup.startTime),
             timerPaused: workoutSetup.timerPaused,
-            pausedTime: workoutSetup.pausedTime,
+            pausedTime: workoutSetup.pausedTime ? new Date(workoutSetup.pausedTime) : null,
             totalPausedTime: workoutSetup.totalPausedTime
         };
     }
     
+    // Finally initialize the page content
     initializeSetupPage();
 });
 

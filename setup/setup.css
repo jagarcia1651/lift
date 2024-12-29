@@ -222,9 +222,17 @@
 }
 
 .setup-actions {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1rem;
+    background: var(--background);
+    border-top: 1px solid var(--border-color);
     display: flex;
     gap: 1rem;
     justify-content: space-between;
+    z-index: 100;
 }
 
 .back-btn, .start-btn {
@@ -329,4 +337,9 @@
 .reset-btn:hover {
     color: var(--primary-color);
     background: var(--background-muted);
+}
+
+/* Add padding to main container to account for fixed buttons */
+.main-container {
+    padding-bottom: calc(var(--header-height) + 2rem);
 } 

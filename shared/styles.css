@@ -943,3 +943,181 @@ input:checked + .slider:before {
 .home-btn:hover {
     color: var(--primary-color);
 } 
+
+.program-overview {
+    background: var(--background-light);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 1.5rem;
+    margin-bottom: 2rem;
+}
+
+.overview-content {
+    color: var(--text-secondary);
+    line-height: 1.6;
+}
+
+.overview-content h3 {
+    margin: 1.5rem 0 0.75rem;
+    color: var(--text-primary);
+}
+
+.schedule-list {
+    list-style: none;
+    padding: 0;
+    margin: 1rem 0;
+}
+
+.schedule-list li {
+    padding: 0.5rem 0;
+    border-bottom: 1px solid var(--border-color);
+}
+
+.schedule-list li:last-child {
+    border-bottom: none;
+} 
+
+.confirm-btn.danger {
+    background: var(--error);
+}
+
+.confirm-btn.danger:hover {
+    background: var(--error-light);
+} 
+
+/* Modal styles */
+.modal {
+    display: none;
+    position: fixed;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: rgba(0, 0, 0, 0.5);
+    align-items: center;
+    justify-content: center;
+    z-index: 1000;
+}
+
+.modal.active {
+    display: flex;
+}
+
+.modal-content {
+    background: var(--background);
+    padding: 2rem;
+    border-radius: var(--border-radius);
+    max-width: 400px;
+    width: 90%;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 1rem;
+    margin-top: 2rem;
+}
+
+.modal-actions button {
+    flex: 1;
+    padding: 0.75rem;
+    border-radius: var(--border-radius);
+    font-weight: 500;
+    cursor: pointer;
+}
+
+.cancel-btn {
+    background: var(--background);
+    border: 1px solid var(--border-color);
+    color: var(--text-color);
+}
+
+.confirm-btn {
+    background: var(--primary-color);
+    border: none;
+    color: white;
+}
+
+.confirm-btn.danger {
+    background: var(--error);
+}
+
+.confirm-btn.danger:hover {
+    background: var(--error-light);
+} 
+
+/* Control buttons container */
+.controls {
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    padding: 1rem;
+    background: var(--background);
+    border-top: 1px solid var(--border-color);
+}
+
+.button-container {
+    max-width: 800px;
+    margin: 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    gap: 1rem;
+}
+
+.start-btn {
+    padding: 0.75rem 2rem;
+    background: var(--primary-color);
+    color: white;
+    border: none;
+    border-radius: var(--border-radius);
+    font-size: 1rem;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.2s ease;
+}
+
+.start-btn:hover {
+    background: var(--primary-hover);
+    transform: translateY(-2px);
+    box-shadow: 0 4px 6px var(--shadow-color);
+}
+
+.reset-btn {
+    padding: 0.75rem 1.5rem;
+    background: transparent;
+    color: var(--error);
+    border: 1px solid currentColor;
+    border-radius: var(--border-radius);
+    font-size: 0.875rem;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.2s ease;
+    opacity: 0.7;
+}
+
+.reset-btn:hover {
+    opacity: 1;
+    background: var(--error-light);
+}
+
+/* Add padding to main container to account for fixed buttons */
+.main-container {
+    padding-bottom: calc(var(--header-height) + 4rem);
+}
+
+/* Mobile adjustments */
+@media (max-width: 640px) {
+    .controls {
+        padding: 0.75rem;
+    }
+
+    .button-container {
+        gap: 0.75rem;
+    }
+
+    .start-btn, .reset-btn {
+        padding: 0.5rem 1rem;
+        font-size: 0.875rem;
+    }
+} 

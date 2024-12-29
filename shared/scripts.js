@@ -175,6 +175,23 @@ document.addEventListener('DOMContentLoaded', initTheme);
 // -------------------------
 // Utility Functions
 // -------------------------
+function getBaseWeight(workoutType) {
+    if (!workoutType || workoutType.toLowerCase().includes('rest')) return 0;
+    
+    let baseWeight = 0;
+    const type = workoutType.toLowerCase();
+    
+    if (type.includes('squat')) {
+        baseWeight = state.program.squat1RM;
+    } else if (type.includes('bench')) {
+        baseWeight = state.program.bench1RM;
+    } else if (type.includes('dead')) {
+        baseWeight = state.program.dead1RM;
+    }
+    
+    return baseWeight;
+}
+
 function getFormattedDate(date) {
     return date.toISOString().split('T')[0];
 }
@@ -205,24 +222,10 @@ function getProgramWeek() {
 }
 
 function getWeightOfTheDay() {
-    const lift = getLiftOfTheDay();
-    if (lift.toLowerCase().includes('rest')) return 0;
-    
-    const isLight = lift.toLowerCase().includes('light');
-    const week = getProgramWeek();
-    let percentage;
-    
-    if (isLight) {
-        percentage = CONFIG.LIGHT_WORKOUT_PERCENTAGE;
-    } else {
-        // Get the scheme for the current week (cycling through 9 weeks)
-        const weekInCycle = (week % 9) + 1;
-        const scheme = CONFIG.PROGRESSION_SCHEMES.find(s => s.week === weekInCycle);
-        percentage = scheme ? scheme.percentage : CONFIG.PROGRESSION_SCHEMES[0].percentage;
-    }
-    
-    const maxWeight = getOneRepMax(lift);
-    return Math.round(maxWeight * percentage);
+    const workoutType = getLiftOfTheDay();
+    const baseWeight = getBaseWeight(workoutType);
+    const percentage = getCurrentPercentage();
+    return roundWeight(baseWeight * (percentage / 100));
 }
 
 function getOneRepMax(lift) {
@@ -233,19 +236,11 @@ function getOneRepMax(lift) {
 }
 
 function getSetsAndReps() {
-    const lift = getLiftOfTheDay();
-    const isLight = lift.toLowerCase().includes('light');
-    
-    if (isLight) {
-        return '4x4';
-    }
-    
     const week = getProgramWeek();
     const weekInCycle = (week % 9) + 1;
     const scheme = CONFIG.PROGRESSION_SCHEMES.find(s => s.week === weekInCycle);
     
-    if (!scheme) return '6x3'; // Default to first week if something goes wrong
-    
+    if (!scheme) return '5x5';  // Default if no scheme found
     return `${scheme.sets}x${scheme.reps}`;
 }
 
@@ -611,4 +606,42 @@ function getCurrentPercentage() {
     const scheme = CONFIG.PROGRESSION_SCHEMES.find(s => s.week === weekInCycle);
     
     return scheme ? scheme.percentage * 100 : 80;
+} 
+
+function showResetConfirmation() {
+    const modalHtml = `
+        <div id="reset-modal" class="modal">
+            <div class="modal-content">
+                <h3>Reset Program</h3>
+                <p>This will clear all program data including your progress and workout history. Are you sure?</p>
+                <div class="modal-actions">
+                    <button type="button" class="cancel-btn" onclick="closeResetModal()">
+                        Cancel
+                    </button>
+                    <button type="button" class="confirm-btn danger" onclick="confirmReset()">
+                        Reset Program
+                    </button>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', modalHtml);
+    document.getElementById('reset-modal').classList.add('active');
+}
+
+function closeResetModal() {
+    const modal = document.getElementById('reset-modal');
+    modal.classList.remove('active');
+    setTimeout(() => modal.remove(), 300);
+}
+
+function confirmReset() {
+    localStorage.clear();
+    closeResetModal();
+    window.location.reload();
+} 
+
+function roundWeight(weight) {
+    return Math.round(weight / 5) * 5;
 } 

@@ -7,87 +7,6 @@
     <meta name="theme-color" content="#3b82f6">
     <title>Power Routine Calculator</title>
     <link rel="stylesheet" href="shared/styles.css">
-    <style>
-        .landing-container {
-            min-height: 100vh;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: flex-start;
-            padding: 4rem 2rem 2rem;
-            text-align: center;
-            gap: 2rem;
-            position: relative;
-        }
-
-        .logo {
-            font-size: 2rem;
-            font-weight: 700;
-            color: var(--primary-color);
-        }
-
-        .start-btn {
-            padding: 1rem 3rem;
-            background: var(--primary-color);
-            color: white;
-            border: none;
-            border-radius: 0.5rem;
-            font-size: 1.25rem;
-            font-weight: 600;
-            cursor: pointer;
-            transition: all 0.2s ease;
-        }
-
-        .start-btn:hover {
-            background: var(--primary-hover);
-            transform: translateY(-2px);
-            box-shadow: 0 4px 6px var(--shadow-color);
-        }
-
-        .reset-btn {
-            position: fixed;
-            bottom: 2rem;
-            right: 2rem;
-            padding: 0.75rem 1.5rem;
-            background: transparent;
-            color: var(--error);
-            border: 1px solid currentColor;
-            border-radius: 0.5rem;
-            font-size: 0.875rem;
-            font-weight: 500;
-            cursor: pointer;
-            transition: all 0.2s ease;
-            opacity: 0.7;
-        }
-
-        .reset-btn:hover {
-            opacity: 1;
-            background: var(--error-light);
-            transform: translateY(-1px);
-        }
-
-        @media (max-width: 640px) {
-            .landing-container {
-                padding: 3rem 1rem 1rem;
-            }
-            
-            .logo {
-                font-size: 1.5rem;
-            }
-            
-            .start-btn {
-                padding: 0.75rem 2rem;
-                font-size: 1rem;
-            }
-
-            .reset-btn {
-                bottom: 1rem;
-                right: 1rem;
-                padding: 0.5rem 1rem;
-                font-size: 0.75rem;
-            }
-        }
-    </style>
 </head>
 <body>
     <header class="app-header">
@@ -98,12 +17,50 @@
             </label>
         </div>
     </header>
-    <main class="landing-container">
-        <div class="logo">Power Routine Calculator</div>
-        <button class="start-btn" onclick="handleStart()">Start</button>
-        <div class="spacer"></div>
-        <button class="reset-btn" onclick="handleReset()">Reset Program Data</button>
+
+    <main class="main-container">
+        <section class="program-overview">
+            <h2>Program Overview</h2>
+            <div class="overview-content">
+                <p>This 9-week powerlifting program focuses on the three main lifts: Squat, Bench Press, and Deadlift. The program follows a 5-day split with progressive overload and built-in deload periods.</p>
+                
+                <h3>Weekly Schedule</h3>
+                <ul class="schedule-list">
+                    <li><strong>Monday:</strong> Heavy Squat</li>
+                    <li><strong>Tuesday:</strong> Light Bench</li>
+                    <li><strong>Wednesday:</strong> Deadlift</li>
+                    <li><strong>Thursday:</strong> Light Squat</li>
+                    <li><strong>Friday:</strong> Heavy Bench</li>
+                    <li><strong>Weekend:</strong> Rest</li>
+                </ul>
+                
+                <p>Each workout includes a primary lift followed by customizable accessories. Weights are calculated based on your one-rep maxes and progress throughout the program.</p>
+            </div>
+        </section>
     </main>
+
+    <footer class="controls">
+        <div class="button-container">
+            <button class="start-btn" onclick="handleStart()">Start Program</button>
+            <button class="reset-btn" onclick="showResetConfirmation()">Reset Program Data</button>
+        </div>
+    </footer>
+
+    <!-- Modal for reset confirmation -->
+    <div id="reset-modal" class="modal">
+        <div class="modal-content">
+            <h3>Reset Program</h3>
+            <p>This will clear all program data including your progress and workout history. Are you sure?</p>
+            <div class="modal-actions">
+                <button type="button" class="cancel-btn" onclick="closeResetModal()">
+                    Cancel
+                </button>
+                <button type="button" class="confirm-btn danger" onclick="confirmReset()">
+                    Reset Program
+                </button>
+            </div>
+        </div>
+    </div>
 
     <script src="shared/scripts.js"></script>
     <script>
@@ -112,27 +69,6 @@
                 window.location.href = './init/init.html';
             } else {
                 window.location.href = './calendar/calendar.html';
-            }
-        }
-
-        function handleReset() {
-            if (confirm('Are you sure you want to reset all program data? This cannot be undone.')) {
-                // Clear all stored data
-                localStorage.removeItem('programInfo');
-                localStorage.removeItem('workoutHistory');
-                
-                // Reset state
-                state.program = {
-                    todayDate: new Date(),
-                    programStart: null,
-                    squat1RM: 0,
-                    dead1RM: 0,
-                    bench1RM: 0
-                };
-                state.workoutHistory = new Map();
-                
-                // Show feedback to user
-                alert('Program data has been reset. Click Start to set up a new program.');
             }
         }
 
@@ -146,6 +82,16 @@
             initTheme();
             initializeState();
         });
+
+        function showResetConfirmation() {
+            const modal = document.getElementById('reset-modal');
+            modal.classList.add('active');
+        }
+
+        function closeResetModal() {
+            const modal = document.getElementById('reset-modal');
+            modal.classList.remove('active');
+        }
     </script>
 </body>
 </html>

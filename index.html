@@ -19,7 +19,8 @@
     </header>
 
     <main class="main-container">
-        <section class="program-overview">
+        <!-- Program Overview (shown when no program exists) -->
+        <section class="program-overview" id="initial-overview">
             <h2>Program Overview</h2>
             <div class="overview-content">
                 <p>This 9-week powerlifting program focuses on the three main lifts: Squat, Bench Press, and Deadlift. The program follows a 5-day split with progressive overload and built-in deload periods.</p>
@@ -35,6 +36,53 @@
                 </ul>
                 
                 <p>Each workout includes a primary lift followed by customizable accessories. Weights are calculated based on your one-rep maxes and progress throughout the program.</p>
+            </div>
+        </section>
+
+        <!-- Active Program Status (shown when program exists) -->
+        <section class="program-status" id="active-program" style="display: none;">
+            <div class="status-header">
+                <h2>Program Status</h2>
+                <div class="program-info">
+                    <span class="start-date"></span>
+                    <span class="week-number"></span>
+                </div>
+            </div>
+
+            <div class="current-maxes">
+                <h3>Current 1RMs</h3>
+                <div class="max-grid">
+                    <div class="max-item">
+                        <span class="lift-name">Squat</span>
+                        <span class="lift-weight squat-1rm"></span>
+                    </div>
+                    <div class="max-item">
+                        <span class="lift-name">Bench</span>
+                        <span class="lift-weight bench-1rm"></span>
+                    </div>
+                    <div class="max-item">
+                        <span class="lift-name">Deadlift</span>
+                        <span class="lift-weight dead-1rm"></span>
+                    </div>
+                </div>
+            </div>
+
+            <div class="program-progress">
+                <h3>Progress Overview</h3>
+                <div class="progress-stats">
+                    <div class="stat-item workouts-completed">
+                        <span class="stat-label">Workouts Completed</span>
+                        <span class="stat-value">0</span>
+                    </div>
+                    <div class="stat-item completion-rate">
+                        <span class="stat-label">Completion Rate</span>
+                        <span class="stat-value">0%</span>
+                    </div>
+                    <div class="stat-item days-remaining">
+                        <span class="stat-label">Days Remaining</span>
+                        <span class="stat-value">63</span>
+                    </div>
+                </div>
             </div>
         </section>
     </main>
@@ -73,12 +121,6 @@
             return !programStart || !squat1RM || !bench1RM || !dead1RM;
         }
 
-        // Initialize on load
-        document.addEventListener('DOMContentLoaded', () => {
-            initTheme();
-            initializeState();
-        });
-
         function showResetConfirmation() {
             const modal = document.getElementById('reset-modal');
             modal.classList.add('active');
@@ -88,6 +130,76 @@
             const modal = document.getElementById('reset-modal');
             modal.classList.remove('active');
         }
+
+        function updateProgramStatus() {
+            const hasProgram = checkInitRequired();
+            const initialOverview = document.getElementById('initial-overview');
+            const activeProgram = document.getElementById('active-program');
+            const startButton = document.querySelector('.btn-primary');
+
+            if (!hasProgram) {
+                // Program exists, show status
+                initialOverview.style.display = 'none';
+                activeProgram.style.display = 'block';
+                startButton.textContent = 'Continue Program';
+
+                // Update program info
+                const startDate = new Date(state.program.programStart);
+                document.querySelector('.start-date').textContent = 
+                    `Started: ${startDate.toLocaleDateString('en-US', { month: 'long', day: 'numeric', year: 'numeric' })}`;
+
+                // Calculate week number (1-based)
+                const today = new Date();
+                const diffTime = Math.abs(today - startDate);
+                const diffDays = Math.ceil(diffTime / (1000 * 60 * 60 * 24));
+                const weekNumber = Math.min(9, Math.ceil(diffDays / 7));
+                document.querySelector('.week-number').textContent = `Week ${weekNumber} of 9`;
+
+                // Update 1RMs
+                document.querySelector('.squat-1rm').textContent = `${state.program.squat1RM} lbs`;
+                document.querySelector('.bench-1rm').textContent = `${state.program.bench1RM} lbs`;
+                document.querySelector('.dead-1rm').textContent = `${state.program.dead1RM} lbs`;
+
+                // Calculate progress stats
+                const workoutDays = Array.from({ length: diffDays }, (_, i) => {
+                    const date = new Date(startDate);
+                    date.setDate(date.getDate() + i);
+                    return date;
+                }).filter(date => !DAYS.LIFT_SCHEDULE[date.getDay()].toLowerCase().includes('rest'));
+
+                const totalPossibleWorkouts = workoutDays.length;
+                const completedWorkouts = Array.from(state.savedWorkouts.values())
+                    .filter(workout => 
+                        workout.progress?.primaryLift?.completed === workout.progress?.primaryLift?.total &&
+                        workout.progress?.accessories?.every(acc => acc.completed === acc.total)
+                    ).length;
+
+                // Calculate completion rate including all possible workout days up to today
+                const pastWorkoutDays = workoutDays.filter(date => date <= today).length;
+                const completionRate = pastWorkoutDays > 0 ? 
+                    Math.round((completedWorkouts / pastWorkoutDays) * 100) : 0;
+
+                // Calculate remaining days (excluding rest days)
+                const totalDays = 63; // 9 weeks * 7 days
+                const daysRemaining = Math.max(0, totalDays - diffDays);
+
+                document.querySelector('.workouts-completed .stat-value').textContent = completedWorkouts;
+                document.querySelector('.completion-rate .stat-value').textContent = `${completionRate}%`;
+                document.querySelector('.days-remaining .stat-value').textContent = daysRemaining;
+            } else {
+                // No program, show overview
+                initialOverview.style.display = 'block';
+                activeProgram.style.display = 'none';
+                startButton.textContent = 'Start Program';
+            }
+        }
+
+        // Initialize on load
+        document.addEventListener('DOMContentLoaded', () => {
+            initTheme();
+            initializeState();
+            updateProgramStatus();
+        });
     </script>
 </body>
 </html>

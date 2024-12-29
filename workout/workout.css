@@ -261,3 +261,17 @@
     cursor: not-allowed;
     background: var(--success);
 } 
+
+/* Add styles for completed workouts */
+.exercise-row[data-completed="true"] {
+    background: var(--success-light);
+    border-color: var(--success);
+}
+
+.exercise-row[data-completed="true"] .exercise-info {
+    color: var(--success);
+}
+
+.timer-display.completed {
+    color: var(--success);
+} 

@@ -19,39 +19,28 @@ document.addEventListener('DOMContentLoaded', () => {
 });
 
 function updateDateDisplay(date) {
-    // Update state first
-    state.program.todayDate = new Date(date);
+    const selectedDate = document.querySelector('.selected-date');
+    const workoutType = document.querySelector('.workout-type');
     
+    // Format date
     const options = { weekday: 'long', year: 'numeric', month: 'long', day: 'numeric' };
-    document.querySelector('.selected-date').textContent = date.toLocaleDateString('en-US', options);
+    selectedDate.textContent = date.toLocaleDateString('en-US', options);
     
-    const workoutType = DAYS.LIFT_SCHEDULE[date.getDay()];
-    document.querySelector('.workout-type').textContent = workoutType;
+    // Update workout type
+    const liftType = DAYS.LIFT_SCHEDULE[date.getDay()];
+    workoutType.textContent = liftType;
     
-    // Update Today button visibility
-    const todayBtn = document.querySelector('.today-btn');
-    const today = new Date();
-    if (todayBtn) {
-        todayBtn.textContent = 'Select Today';
-        if (date.toDateString() === today.toDateString()) {
-            todayBtn.style.display = 'none';
-        } else {
-            todayBtn.style.display = 'block';
-        }
-    }
-    
-    // Update workout status
-    updateWorkoutStatus(date);
-    // Update workout overview
-    updateWorkoutOverview(date);
-    // Update calendar - this will handle the selected state
+    // Update calendar display
     generateCalendar(date);
+    
+    // Update workout status and overview
+    updateWorkoutStatus(date);
+    updateWorkoutOverview(date);
 }
 
 function updateWorkoutStatus(date) {
     const dateKey = getFormattedDate(date);
-    const workoutHistory = new Map(JSON.parse(localStorage.getItem('workoutHistory') || '[]'));
-    const workoutData = workoutHistory.get(dateKey);
+    const savedWorkout = state.savedWorkouts.get(dateKey);
     
     const statusDot = document.querySelector('.status-dot');
     const statusText = document.querySelector('.status-text');
@@ -84,11 +73,19 @@ function updateWorkoutStatus(date) {
         return;
     }
     
-    if (workoutData) {
-        if (workoutData.completed) {
+    if (savedWorkout) {
+        // Check for partial completion
+        const hasPartialProgress = savedWorkout.progress?.primaryLift?.completed > 0 || 
+            savedWorkout.progress?.accessories?.some(acc => acc.completed > 0);
+            
+        // Check for full completion
+        const isFullyComplete = savedWorkout.progress?.primaryLift?.completed === savedWorkout.progress?.primaryLift?.total &&
+            savedWorkout.progress?.accessories?.every(acc => acc.completed === acc.total);
+        
+        if (isFullyComplete) {
             statusDot.classList.add('complete');
             statusText.textContent = 'Complete';
-        } else if (workoutData.primaryCompleted) {
+        } else if (hasPartialProgress) {
             statusDot.classList.add('partial');
             statusText.textContent = 'Partial';
         } else {
@@ -134,6 +131,17 @@ function updateWorkoutOverview(date) {
     const workoutType = DAYS.LIFT_SCHEDULE[date.getDay()];
     const isRestDay = workoutType.toLowerCase().includes('rest');
     
+    // Check if workout exists for this date
+    const dateKey = getFormattedDate(date);
+    const savedWorkout = state.savedWorkouts.get(dateKey);
+    
+    // Check workout states
+    const isWorkoutComplete = savedWorkout?.progress?.primaryLift?.completed === savedWorkout?.progress?.primaryLift?.total &&
+        savedWorkout?.progress?.accessories?.every(acc => acc.completed === acc.total);
+    
+    const hasProgress = savedWorkout?.progress?.primaryLift?.completed > 0 || 
+        savedWorkout?.progress?.accessories?.some(acc => acc.completed > 0);
+    
     // Ensure the proper HTML structure exists
     if (!overview.querySelector('.lift-details')) {
         overview.innerHTML = `
@@ -142,7 +150,9 @@ function updateWorkoutOverview(date) {
                 <span class="lift-weight"></span>
                 <span class="lift-sets"></span>
             </div>
-            <button type="button" class="setup-btn">Setup Workout</button>
+            <button type="button" class="btn btn-primary setup-btn">
+                ${isWorkoutComplete ? 'View Workout' : (hasProgress ? 'Resume Workout' : 'Setup Workout')}
+            </button>
         `;
     }
     
@@ -167,10 +177,37 @@ function updateWorkoutOverview(date) {
         liftWeight.textContent = `${weight} lbs (${percentage}%)`;
         liftSets.textContent = setsReps;
         setupBtn.style.display = 'block';
+        setupBtn.textContent = isWorkoutComplete ? 'View Workout' : 
+            (hasProgress ? 'Resume Workout' : 'Setup Workout');
         
         setupBtn.onclick = () => {
-            localStorage.setItem('selectedWorkoutDate', date.toISOString());
-            window.location.href = '../setup/setup.html';
+            if (isWorkoutComplete) {
+                // For completed workouts, go directly to workout view
+                localStorage.setItem('workoutSetup', JSON.stringify({
+                    ...savedWorkout.setup,
+                    selectedDate: date.toISOString()
+                }));
+                window.location.href = '../workout/workout.html';
+            } else if (hasProgress) {
+                // For partial workouts, go directly to workout view and resume
+                const setupData = {
+                    selectedDate: date.toISOString(),
+                    selectedAccessories: savedWorkout?.setup?.selectedAccessories || [],
+                    startTime: savedWorkout?.setup?.startTime,
+                    timerPaused: false, // Start timer automatically
+                    totalPausedTime: savedWorkout?.setup?.totalPausedTime || 0,
+                    progress: savedWorkout?.progress
+                };
+                localStorage.setItem('workoutSetup', JSON.stringify(setupData));
+                window.location.href = '../workout/workout.html';
+            } else {
+                // For new workouts, go to setup
+                const setupData = {
+                    selectedDate: date.toISOString()
+                };
+                localStorage.setItem('workoutSetup', JSON.stringify(setupData));
+                window.location.href = '../setup/setup.html';
+            }
         };
     }
 }
@@ -189,14 +226,29 @@ function nextDay() {
     updateDateDisplay(newDate);
 }
 
-function generateCalendar(currentDate) {
+function generateCalendar(date) {
     const calendar = document.querySelector('.simple-calendar');
     if (!calendar) return;
     
+    // Get first day of the month
+    const firstDay = new Date(date.getFullYear(), date.getMonth(), 1);
+    // Get last day of the month
+    const lastDay = new Date(date.getFullYear(), date.getMonth() + 1, 0);
+    
+    // Clear existing calendar
     calendar.innerHTML = '';
     
-    const firstDay = new Date(currentDate.getFullYear(), currentDate.getMonth(), 1);
-    const lastDay = new Date(currentDate.getFullYear(), currentDate.getMonth() + 1, 0);
+    // Update current date to maintain selected date in new month
+    currentDate = new Date(date);
+    
+    // Generate calendar grid
+    generateCalendarGrid(firstDay, lastDay, currentDate);
+}
+
+function generateCalendarGrid(firstDay, lastDay, selectedDate) {
+    const calendar = document.querySelector('.simple-calendar');
+    if (!calendar) return;
+    
     const startingDay = firstDay.getDay();
     const monthLength = lastDay.getDate();
     
@@ -208,16 +260,15 @@ function generateCalendar(currentDate) {
         const dayNumber = i - startingDay + 1;
         
         if (dayNumber > 0 && dayNumber <= monthLength) {
-            const date = new Date(currentDate.getFullYear(), currentDate.getMonth(), dayNumber);
+            const date = new Date(selectedDate.getFullYear(), selectedDate.getMonth(), dayNumber);
             const status = getDateStatus(date);
             
             dayDiv.className = 'calendar-day';
             dayDiv.classList.add(status);
             dayDiv.textContent = dayNumber;
             
-            if (date.getDate() === currentDate.getDate() && 
-                date.getMonth() === currentDate.getMonth() && 
-                date.getFullYear() === currentDate.getFullYear()) {
+            // Check if this is the selected date
+            if (dayNumber === selectedDate.getDate()) {
                 dayDiv.classList.add('selected');
             }
             
@@ -242,44 +293,37 @@ function generateCalendar(currentDate) {
 
 // Add function to determine date status
 function getDateStatus(date) {
+    const dateKey = getFormattedDate(date);
+    const savedWorkout = state.savedWorkouts.get(dateKey);
+    
     // Check if date is before program start
     const programStart = new Date(state.program.programStart);
     programStart.setHours(0, 0, 0, 0);
     const checkDate = new Date(date);
     checkDate.setHours(0, 0, 0, 0);
     
-    if (checkDate < programStart) {
-        return 'before-program';
-    }
+    if (checkDate < programStart) return 'before-program';
+    if (isProgramComplete(date)) return 'rest';
+    if (DAYS.LIFT_SCHEDULE[date.getDay()].toLowerCase().includes('rest')) return 'rest';
     
-    const dateKey = getFormattedDate(date);
-    const workoutHistory = new Map(JSON.parse(localStorage.getItem('workoutHistory') || '[]'));
-    const workoutData = workoutHistory.get(dateKey);
-    
-    // Add program completion check
-    if (isProgramComplete(date)) {
-        return 'rest';
-    }
-    
-    // Check if it's a rest day
-    if (DAYS.LIFT_SCHEDULE[date.getDay()].toLowerCase().includes('rest')) {
-        return 'rest';
-    }
-    
-    if (workoutData) {
-        if (workoutData.completed) return 'complete';
-        if (workoutData.primaryCompleted) return 'partial';
+    if (savedWorkout) {
+        // Check for partial completion
+        const hasPartialProgress = savedWorkout.progress?.primaryLift?.completed > 0 || 
+            savedWorkout.progress?.accessories?.some(acc => acc.completed > 0);
+            
+        // Check for full completion
+        const isFullyComplete = savedWorkout.progress?.primaryLift?.completed === savedWorkout.progress?.primaryLift?.total &&
+            savedWorkout.progress?.accessories?.every(acc => acc.completed === acc.total);
+        
+        if (isFullyComplete) return 'complete';
+        if (hasPartialProgress) return 'partial';
         return 'missed';
     }
     
     const today = new Date();
     today.setHours(0, 0, 0, 0);
     
-    if (checkDate < today) {
-        return 'missed';
-    }
-    
-    return 'upcoming';
+    return checkDate < today ? 'missed' : 'upcoming';
 }
 
 // Add this function to initialize the calendar page

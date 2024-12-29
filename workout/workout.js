@@ -21,18 +21,21 @@ function initializeWorkoutPage() {
         state.program.todayDate = new Date(workoutSetup.selectedDate);
     }
     
-    // Check if this is a new workout or resuming an existing one
-    const isNewWorkout = !workoutSetup.startTime || 
-        !isSameDay(new Date(workoutSetup.selectedDate), new Date(workoutSetup.startTime));
+    // Check if this is a completed or partial workout
+    const dateKey = getFormattedDate(state.program.todayDate);
+    const savedWorkout = state.savedWorkouts.get(dateKey);
+    
+    // Check if this is a new workout
+    const isNewWorkout = !workoutSetup.startTime && !savedWorkout?.progress;
     
     // Initialize workout state
     state.workout = {
-        startTime: isNewWorkout ? new Date() : new Date(workoutSetup.startTime),
+        startTime: isNewWorkout ? new Date() : (workoutSetup.startTime ? new Date(workoutSetup.startTime) : new Date()),
         timerInterval: null,
-        timerPaused: isNewWorkout ? false : (workoutSetup.timerPaused || false),
-        pausedTime: workoutSetup.pausedTime ? new Date(workoutSetup.pausedTime) : null,
-        totalPausedTime: isNewWorkout ? 0 : (workoutSetup.totalPausedTime || 0),
-        accessories: workoutSetup.selectedAccessories || [],
+        timerPaused: !isNewWorkout, // Only pause if it's not a new workout
+        pausedTime: null,
+        totalPausedTime: workoutSetup.totalPausedTime || 0,
+        accessories: workoutSetup.selectedAccessories || savedWorkout?.setup?.selectedAccessories || [],
         restStartTime: null,
         restInterval: null
     };
@@ -43,17 +46,37 @@ function initializeWorkoutPage() {
     setupEventListeners();
     setupRestTimer();
     
+    // Restore workout progress if it exists
+    const progressToRestore = workoutSetup.progress || savedWorkout?.progress;
+    if (progressToRestore) {
+        updateWorkoutProgress(progressToRestore);
+    }
+    
     // Start the workout timer
     const timerDisplay = document.querySelector('.timer-display');
     const timerBtn = document.querySelector('.timer-btn');
     
-    updateTimer(); // Update display immediately
+    updateTimer(); // Initial display update
     
-    if (!state.workout.timerPaused) {
+    if (isWorkoutComplete()) {
+        timerBtn.textContent = 'Workout Complete';
+        timerBtn.disabled = true;
+        timerDisplay.classList.add('completed');
+        updateBackButton(true);
+    } else if (isNewWorkout) {
+        // Start timer automatically for new workouts
+        state.workout.timerPaused = false;
+        state.workout.startTime = new Date();
+        updateTimer();
         state.workout.timerInterval = setInterval(updateTimer, 1000);
         timerBtn.textContent = 'Pause Timer';
     } else {
-        timerBtn.textContent = 'Resume Timer';
+        // Resume partial workout
+        state.workout.timerPaused = false;
+        updateTimer();
+        state.workout.timerInterval = setInterval(updateTimer, 1000);
+        timerBtn.textContent = 'Pause Timer';
+        updateBackButton(false);
     }
 }
 
@@ -66,16 +89,16 @@ function updateHeaderInfo() {
 // -------------------------
 // Timer Management
 // -------------------------
-function initializeTimer() {
-    state.workout.startTime = new Date();
-    state.workout.timerInterval = setInterval(updateTimer, 1000);
-}
-
 function updateTimer() {
     if (!state.workout.startTime) return;
     
-    const elapsed = new Date() - state.workout.startTime - state.workout.totalPausedTime;
-    document.querySelector('.timer-display').textContent = formatTime(elapsed);
+    const now = new Date();
+    const elapsed = now - state.workout.startTime - state.workout.totalPausedTime;
+    const timerDisplay = document.querySelector('.timer-display');
+    
+    if (timerDisplay) {
+        timerDisplay.textContent = formatTime(elapsed);
+    }
 }
 
 function toggleTimer() {
@@ -85,7 +108,10 @@ function toggleTimer() {
     if (state.workout.timerPaused) {
         // Resume timer
         state.workout.timerPaused = false;
-        state.workout.totalPausedTime += (new Date() - state.workout.pausedTime);
+        if (state.workout.pausedTime) {
+            state.workout.totalPausedTime += (new Date() - state.workout.pausedTime);
+        }
+        state.workout.pausedTime = null;
         state.workout.timerInterval = setInterval(updateTimer, 1000);
         timerBtn.textContent = 'Pause Timer';
         timerDisplay.classList.remove('paused');
@@ -94,6 +120,7 @@ function toggleTimer() {
         state.workout.timerPaused = true;
         state.workout.pausedTime = new Date();
         clearInterval(state.workout.timerInterval);
+        state.workout.timerInterval = null;
         timerBtn.textContent = 'Resume Timer';
         timerDisplay.classList.add('paused');
     }
@@ -210,12 +237,10 @@ function completeSet(exerciseId) {
             workoutState.primaryComplete = newCompleted === total;
         }
         
-        // Start rest timer after completing a set, passing the exerciseId
         startRestTimer(exerciseId);
         
         // Check if all sets are complete after this update
         if (isWorkoutComplete()) {
-            // Stop both timers
             clearInterval(state.workout.timerInterval);
             clearInterval(state.workout.restInterval);
             
@@ -223,6 +248,9 @@ function completeSet(exerciseId) {
             const timerBtn = document.querySelector('.timer-btn');
             timerBtn.textContent = 'Workout Complete';
             timerBtn.disabled = true;
+            
+            // Update back button
+            updateBackButton(true);
             
             // Show completion message
             const message = document.createElement('div');
@@ -244,7 +272,6 @@ function completeSet(exerciseId) {
             setTimeout(() => message.remove(), 3000);
         }
         
-        // Save workout state after set completion
         saveWorkoutState(state.program.todayDate);
     }
 }
@@ -469,4 +496,68 @@ function isSameDay(date1, date2) {
 // Add helper function to check if we're completing a primary lift set
 function isPrimaryLift(exerciseId) {
     return exerciseId === 'primary';
+}
+
+function updateCompletedWorkout(progress) {
+    // Update primary lift
+    if (progress.primaryLift) {
+        const primary = document.querySelector('.exercise-row.primary');
+        if (primary) {
+            primary.dataset.completed = 'true';
+            primary.querySelector('.sets-completed').textContent = progress.primaryLift.completed;
+            primary.querySelector('.set-checkmarks').innerHTML = 
+                generateSetCheckmarks(progress.primaryLift.completed, progress.primaryLift.total);
+        }
+    }
+    
+    // Update accessories
+    progress.accessories.forEach((acc, index) => {
+        const row = document.querySelector(`[data-exercise-id="accessory-${index}"]`);
+        if (row) {
+            row.dataset.completed = 'true';
+            row.querySelector('.sets-completed').textContent = acc.completed;
+            row.querySelector('.set-checkmarks').innerHTML = 
+                generateSetCheckmarks(acc.completed, acc.total);
+        }
+    });
+    
+    // Update back button to return to calendar
+    updateBackButton(true);
+}
+
+// Add new helper function
+function updateBackButton(completed = false) {
+    const backBtn = document.querySelector('.back-btn');
+    if (backBtn) {
+        const backText = backBtn.querySelector('.back-text');
+        if (backText) {
+            backText.textContent = completed ? 'Return to Calendar' : 'Return to Setup';
+        }
+        backBtn.onclick = () => {
+            window.location.href = completed ? '../calendar/calendar.html' : '../setup/setup.html';
+        };
+    }
+}
+
+// Add new function to handle partial progress
+function updateWorkoutProgress(progress) {
+    // Update primary lift
+    if (progress.primaryLift) {
+        const primary = document.querySelector('.exercise-row.primary');
+        if (primary) {
+            primary.querySelector('.sets-completed').textContent = progress.primaryLift.completed;
+            primary.querySelector('.set-checkmarks').innerHTML = 
+                generateSetCheckmarks(progress.primaryLift.completed, progress.primaryLift.total);
+        }
+    }
+    
+    // Update accessories
+    progress.accessories?.forEach((acc, index) => {
+        const row = document.querySelector(`[data-exercise-id="accessory-${index}"]`);
+        if (row) {
+            row.querySelector('.sets-completed').textContent = acc.completed;
+            row.querySelector('.set-checkmarks').innerHTML = 
+                generateSetCheckmarks(acc.completed, acc.total);
+        }
+    });
 }

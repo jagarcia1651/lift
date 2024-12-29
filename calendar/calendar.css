@@ -275,3 +275,98 @@
 .app-header {
     z-index: 200;
 } 
+
+/* Calendar Day Styles */
+.calendar-day {
+    aspect-ratio: 1;
+    padding: 0.25rem;
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    cursor: pointer;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    font-weight: 500;
+    transition: all 0.2s ease;
+    position: relative;
+}
+
+/* Selected Day Styling */
+.calendar-day.selected {
+    border: 2px solid var(--primary);
+    background: var(--primary-hover);
+    color: white;
+    font-weight: 600;
+    transform: scale(1.05);
+    box-shadow: 0 2px 4px var(--shadow-color);
+    z-index: 1;
+}
+
+/* Status colors should still show through */
+.calendar-day.selected.complete {
+    border-color: var(--success);
+    background: var(--success);
+}
+
+.calendar-day.selected.partial {
+    border-color: var(--warning);
+    background: var(--warning);
+}
+
+.calendar-day.selected.missed {
+    border-color: var(--error);
+    background: var(--error);
+}
+
+.calendar-day.selected.rest {
+    border-color: var(--text-muted);
+    background: var(--text-muted);
+}
+
+/* Hover effect for non-selected days */
+.calendar-day:not(.selected):not(.empty):hover {
+    transform: translateY(-2px);
+    box-shadow: 0 2px 4px var(--shadow-color);
+}
+
+/* Empty days should not have hover effects or pointer cursor */
+.calendar-day.empty {
+    border-color: transparent;
+    cursor: default;
+}
+
+.calendar-day.empty:hover {
+    transform: none;
+    box-shadow: none;
+} 
+
+/* Update the selected complete day styling */
+.calendar-day.selected.complete {
+    border: 2px solid var(--success);
+    background: var(--success);
+    color: white;
+    font-weight: 700;
+    transform: scale(1.1);  /* Slightly larger scale */
+    box-shadow: 0 0 0 2px var(--background), /* Inner white glow */
+                0 0 0 4px var(--success),     /* Outer success color ring */
+                0 4px 6px var(--shadow-color); /* Bottom shadow */
+    z-index: 2; /* Ensure it stays above other selected states */
+}
+
+/* Add a subtle pulse animation for selected complete days */
+@keyframes selectedCompletePulse {
+    0% { transform: scale(1.1); }
+    50% { transform: scale(1.15); }
+    100% { transform: scale(1.1); }
+}
+
+.calendar-day.selected.complete {
+    animation: selectedCompletePulse 2s ease-in-out infinite;
+}
+
+/* Adjust hover state for complete days */
+.calendar-day.complete:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 3px 6px var(--shadow-color);
+} 

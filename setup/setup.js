@@ -78,17 +78,39 @@ const setupState = {
 // -------------------------
 function initializeSetupPage() {
     try {
+        // Load workout setup data first
+        const workoutSetup = JSON.parse(localStorage.getItem('workoutSetup') || '{}');
+        
+        // Set the date from workout setup
+        if (workoutSetup.selectedDate) {
+            state.program.todayDate = new Date(workoutSetup.selectedDate);
+        }
+        
+        // Initialize workout state with any existing progress
+        if (workoutSetup.startTime) {
+            state.workout = {
+                ...state.workout,
+                startTime: new Date(workoutSetup.startTime),
+                timerPaused: workoutSetup.timerPaused,
+                totalPausedTime: workoutSetup.totalPausedTime || 0
+            };
+        }
+        
         updateHeaderInfo();
         
         // Load saved workout state if it exists
         const dateKey = getFormattedDate(state.program.todayDate);
         const savedWorkout = state.savedWorkouts.get(dateKey);
         
-        if (savedWorkout?.setup) {
-            localStorage.setItem('workoutSetup', JSON.stringify(savedWorkout.setup));
+        if (savedWorkout?.setup || workoutSetup.selectedAccessories?.length > 0) {
+            // Use existing accessories if available
+            setupState.selectedAccessories = workoutSetup.selectedAccessories || 
+                savedWorkout?.setup?.selectedAccessories || [];
+        } else {
+            // Load recommended accessories for new workouts
+            loadRecommendedAccessories();
         }
         
-        loadRecommendedAccessories();
         loadOptionalAccessories();
         setupEventListeners();
     } catch (error) {
@@ -213,14 +235,19 @@ function setupEventListeners() {
 }
 
 function startWorkout() {
-    // Save selected accessories and date to localStorage
-    const workoutSetup = {
+    const workoutSetup = JSON.parse(localStorage.getItem('workoutSetup') || '{}');
+    
+    // Save selected accessories and preserve existing state
+    const updatedSetup = {
         selectedDate: state.program.todayDate,
         selectedAccessories: setupState.selectedAccessories,
-        ...state.workout // Preserve any existing workout state (timer, etc)
+        startTime: workoutSetup.startTime || new Date(),
+        timerPaused: true,
+        totalPausedTime: workoutSetup.totalPausedTime || 0,
+        progress: workoutSetup.progress // Preserve any existing progress
     };
     
-    localStorage.setItem('workoutSetup', JSON.stringify(workoutSetup));
+    localStorage.setItem('workoutSetup', JSON.stringify(updatedSetup));
     window.location.href = '../workout/workout.html';
 }
 

@@ -7,8 +7,17 @@
 // -------------------------
 const CONFIG = {
     LIGHT_WORKOUT_PERCENTAGE: 0.6,
-    BASE_HEAVY_PERCENTAGE: 0.8,
-    PROGRESSION_INCREMENT: 0.05
+    PROGRESSION_SCHEMES: [
+        { week: 1, sets: 6, reps: 3, percentage: 0.80 },
+        { week: 2, sets: 6, reps: 4, percentage: 0.80 },
+        { week: 3, sets: 6, reps: 5, percentage: 0.80 },
+        { week: 4, sets: 6, reps: 6, percentage: 0.80 },
+        { week: 5, sets: 5, reps: 5, percentage: 0.85 },
+        { week: 6, sets: 4, reps: 4, percentage: 0.90 },
+        { week: 7, sets: 3, reps: 3, percentage: 0.95 },
+        { week: 8, sets: 2, reps: 2, percentage: 1.00 },
+        { week: 9, sets: 1, reps: 1, percentage: 1.05 }
+    ]
 };
 
 const DAYS = Object.freeze({
@@ -20,33 +29,27 @@ const ACCESSORIES = Object.freeze({
     "Heavy Squat": [
         { exercise: "Leg Extension", setsReps: "3x15", weight: "~20RM" },
         { exercise: "Leg Curl", setsReps: "3x15", weight: "~20RM" },
-        { exercise: "Calf Raises", setsReps: "4x15", weight: "~20RM" },
-        { exercise: "Hanging Leg Raise Variations", setsReps: "5x10", weight: "N/A" },
-        { exercise: "Toe Touches", setsReps: "3x10", weight: "Bodyweight" }
+        { exercise: "Hanging Leg Raise Variations", setsReps: "3x10", weight: "Bodyweight" }
     ],
     "Light Squat": [
-        { exercise: "Bulgarian Split Squats", setsReps: "3x8", weight: "~10RM" },
-        { exercise: "Step-Ups", setsReps: "3x8", weight: "~12RM" },
-        { exercise: "Single Leg RDL", setsReps: "3x8", weight: "~12RM" },
-        { exercise: "Walking Lunges", setsReps: "3x12-10-8", weight: "~15RM" }
+        { exercise: "Romanian Deadlifts", setsReps: "3x10", weight: "~12RM" },
+        { exercise: "Back Extensions", setsReps: "3x15", weight: "Bodyweight" },
+        { exercise: "Toe Touches", setsReps: "3x15", weight: "Bodyweight" }
     ],
     "Heavy Bench": [
-        { exercise: "Incline Dumbbell Chest Flys", setsReps: "3x15", weight: "~20RM" },
-        { exercise: "Dumbbell Lateral Raises", setsReps: "3x12", weight: "~15RM" },
+        { exercise: "Paused Barbell Bench", setsReps: "3x8", weight: "~12RM" },
+        { exercise: "Dumbbell Lateral Raises", setsReps: "3x12-10-8", weight: "~15RM" },
         { exercise: "Barbell Skull Crushers", setsReps: "3x15", weight: "~20RM" }
     ],
     "Light Bench": [
-        { exercise: "Incline Bench", setsReps: "3x8", weight: "~10RM" },
-        { exercise: "Incline Dumbbell Bench", setsReps: "3x6", weight: "~8RM" },
-        { exercise: "Narrow Grip Bench", setsReps: "4x6", weight: "~8RM" },
-        { exercise: "Dumbbell Overhead Press", setsReps: "3x6", weight: "~8RM" }
+        { exercise: "Incline Dumbbell Bench", setsReps: "3x8", weight: "~12RM" },
+        { exercise: "Incline Dumbbell Chest Flys", setsReps: "3x12-10-8", weight: "~15RM" },
+        { exercise: "Narrow Grip Bench", setsReps: "3x15", weight: "~20RM" }
     ],
     "Deadlift": [
-        { exercise: "Barbell Rows", setsReps: "3x12-10-8", weight: "~15RM" },
-        { exercise: "Dumbbell Rows", setsReps: "3x8", weight: "~12RM" },
-        { exercise: "Good Mornings", setsReps: "3x12", weight: "~15RM" },
-        { exercise: "Laying Bicep Curls", setsReps: "3x12-10-8", weight: "~15RM" },
-        { exercise: "Chin-Ups", setsReps: "3xMax", weight: "Bodyweight" }
+        { exercise: "Kroc Rows", setsReps: "3x8", weight: "~10RM" },
+        { exercise: "Hanging Leg Raise Variations", setsReps: "3x10", weight: "Bodyweight" },        
+        { exercise: "Pull-Ups", setsReps: "3xMax", weight: "Bodyweight" }
     ]
 });
 
@@ -108,21 +111,30 @@ function initializeState() {
         const savedProgramInfo = localStorage.getItem('programInfo');
         if (savedProgramInfo) {
             const { squat1RM, dead1RM, bench1RM, programStart } = JSON.parse(savedProgramInfo);
+            
+            // Create date object and adjust for timezone
+            const startDate = new Date(programStart);
+            startDate.setMinutes(startDate.getMinutes() + startDate.getTimezoneOffset());
+            
             state.program = {
                 ...state.program,
                 squat1RM: squat1RM || 0,
                 dead1RM: dead1RM || 0,
                 bench1RM: bench1RM || 0,
-                programStart: new Date(programStart) || new Date('2024-11-25')
+                programStart: startDate || new Date()
             };
         } else {
             // Set default program start if no saved data
-            state.program.programStart = new Date('2024-11-25');
+            const defaultDate = new Date();
+            defaultDate.setMinutes(defaultDate.getMinutes() + defaultDate.getTimezoneOffset());
+            state.program.programStart = defaultDate;
         }
     } catch (error) {
         console.error('Error initializing state:', error);
         // Use default program start on error
-        state.program.programStart = new Date('2024-11-25');
+        const defaultDate = new Date();
+        defaultDate.setMinutes(defaultDate.getMinutes() + defaultDate.getTimezoneOffset());
+        state.program.programStart = defaultDate;
     }
 }
 
@@ -198,8 +210,16 @@ function getWeightOfTheDay() {
     
     const isLight = lift.toLowerCase().includes('light');
     const week = getProgramWeek();
-    const percentage = isLight ? CONFIG.LIGHT_WORKOUT_PERCENTAGE : 
-                               CONFIG.BASE_HEAVY_PERCENTAGE + (week * CONFIG.PROGRESSION_INCREMENT);
+    let percentage;
+    
+    if (isLight) {
+        percentage = CONFIG.LIGHT_WORKOUT_PERCENTAGE;
+    } else {
+        // Get the scheme for the current week (cycling through 9 weeks)
+        const weekInCycle = (week % 9) + 1;
+        const scheme = CONFIG.PROGRESSION_SCHEMES.find(s => s.week === weekInCycle);
+        percentage = scheme ? scheme.percentage : CONFIG.PROGRESSION_SCHEMES[0].percentage;
+    }
     
     const maxWeight = getOneRepMax(lift);
     return Math.round(maxWeight * percentage);
@@ -214,7 +234,19 @@ function getOneRepMax(lift) {
 
 function getSetsAndReps() {
     const lift = getLiftOfTheDay();
-    return lift.toLowerCase().includes('light') ? '3x8' : '5x5';
+    const isLight = lift.toLowerCase().includes('light');
+    
+    if (isLight) {
+        return '4x4';
+    }
+    
+    const week = getProgramWeek();
+    const weekInCycle = (week % 9) + 1;
+    const scheme = CONFIG.PROGRESSION_SCHEMES.find(s => s.week === weekInCycle);
+    
+    if (!scheme) return '6x3'; // Default to first week if something goes wrong
+    
+    return `${scheme.sets}x${scheme.reps}`;
 }
 
 function areAllFieldsFilled() {
@@ -563,4 +595,20 @@ function generateCalendar(currentDate) {
         
         calendar.appendChild(dayDiv);
     }
+} 
+
+// Add helper function to get current percentage
+function getCurrentPercentage() {
+    const lift = getLiftOfTheDay();
+    const isLight = lift.toLowerCase().includes('light');
+    
+    if (isLight) {
+        return CONFIG.LIGHT_WORKOUT_PERCENTAGE * 100;
+    }
+    
+    const week = getProgramWeek();
+    const weekInCycle = (week % 9) + 1;
+    const scheme = CONFIG.PROGRESSION_SCHEMES.find(s => s.week === weekInCycle);
+    
+    return scheme ? scheme.percentage * 100 : 80;
 } 

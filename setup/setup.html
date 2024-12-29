@@ -11,6 +11,9 @@
 </head>
 <body>
     <header class="app-header">
+        <button type="button" class="home-btn" onclick="window.location.href='../index.html'" aria-label="Go to home page">
+            🏠
+        </button>
         <div class="theme-switch">
             <label class="switch" for="theme-toggle">
                 <input type="checkbox" id="theme-toggle" aria-label="Toggle dark mode">
@@ -32,17 +35,23 @@
             </div>
 
             <div class="accessories-container">
-                <h3>Select Accessories</h3>
                 <div class="accessory-groups">
+                    <!-- Selected Accessories Section -->
                     <div class="accessory-group">
-                        <h4>Recommended</h4>
-                        <div class="accessory-list" id="recommended-accessories">
+                        <div class="section-header">
+                            <h3>Selected Accessories</h3>
+                            <button class="reset-btn" onclick="resetToDefault()" title="Reset to Default">
+                                ↺ Reset
+                            </button>
+                        </div>
+                        <div class="accessory-list" id="selected-accessories">
                             <!-- Populated by JavaScript -->
                         </div>
                     </div>
                     
+                    <!-- Optional Accessories Section -->
                     <div class="accessory-group">
-                        <h4>Optional</h4>
+                        <h3>Add Accessories</h3>
                         <div class="pool-selector">
                             <button class="pool-btn active" data-pool="legs">Legs</button>
                             <button class="pool-btn" data-pool="push">Push</button>
@@ -57,7 +66,7 @@
 
             <div class="setup-actions">
                 <button type="button" class="back-btn" onclick="handleBack()">
-                    Back to Home
+                    Back to Calendar
                 </button>
                 <button type="button" class="start-btn" onclick="startWorkout()">
                     Start Workout

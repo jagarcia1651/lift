@@ -71,7 +71,7 @@ function setTodayDate(date) {
 // Setup Page State
 // -------------------------
 const setupState = {
-    selectedAccessories: new Set(),
+    selectedAccessories: [],
     currentPool: 'legs'
 };
 
@@ -105,15 +105,28 @@ function updateHeaderInfo() {
 function loadRecommendedAccessories() {
     const workoutType = getLiftOfTheDay();
     const recommended = ACCESSORIES[workoutType] || [];
-    const container = document.getElementById('recommended-accessories');
+    setupState.selectedAccessories = [...recommended];
+    updateSelectedAccessories();
+}
+
+function updateSelectedAccessories() {
+    const container = document.getElementById('selected-accessories');
     
-    container.innerHTML = recommended.map((exercise, index) => `
-        <div class="accessory-item" data-id="recommended-${index}" onclick="toggleAccessory(this)">
+    container.innerHTML = setupState.selectedAccessories.map((exercise, index) => `
+        <div class="accessory-item" data-index="${index}">
             <div class="accessory-info">
                 <h5>${exercise.exercise}</h5>
                 <div class="accessory-details">
                     ${exercise.setsReps} @ ${exercise.weight}
                 </div>
+            </div>
+            <div class="accessory-controls">
+                <button class="accessory-btn swap" onclick="swapExercise(${index})" title="Swap Exercise">
+                    🔄
+                </button>
+                <button class="accessory-btn remove" onclick="removeAccessory(${index})" title="Remove Exercise">
+                    ✕
+                </button>
             </div>
         </div>
     `).join('');
@@ -124,7 +137,7 @@ function loadOptionalAccessories() {
     const poolExercises = ACCESSORY_POOLS[setupState.currentPool] || [];
     
     container.innerHTML = poolExercises.map((exercise, index) => `
-        <div class="accessory-item" data-id="optional-${index}" onclick="toggleAccessory(this)">
+        <div class="accessory-item optional-accessory" onclick="addAccessory(${index})">
             <div class="accessory-info">
                 <h5>${exercise.exercise}</h5>
                 <div class="accessory-details">
@@ -135,15 +148,41 @@ function loadOptionalAccessories() {
     `).join('');
 }
 
-function toggleAccessory(element) {
-    const id = element.dataset.id;
-    if (setupState.selectedAccessories.has(id)) {
-        setupState.selectedAccessories.delete(id);
-        element.classList.remove('selected');
-    } else {
-        setupState.selectedAccessories.add(id);
-        element.classList.add('selected');
+function removeAccessory(index) {
+    setupState.selectedAccessories.splice(index, 1);
+    updateSelectedAccessories();
+}
+
+function addAccessory(index) {
+    const exercise = ACCESSORY_POOLS[setupState.currentPool][index];
+    setupState.selectedAccessories.push(exercise);
+    updateSelectedAccessories();
+}
+
+function swapExercise(index) {
+    const currentExercise = setupState.selectedAccessories[index];
+    const currentPool = getSimilarExercisePool(currentExercise);
+    const poolExercises = ACCESSORY_POOLS[currentPool] || [];
+    
+    // Find similar exercises (excluding the current one)
+    const similarExercises = poolExercises.filter(exercise => 
+        exercise.exercise !== currentExercise.exercise
+    );
+    
+    if (similarExercises.length > 0) {
+        // Replace the current exercise with a random similar one
+        const randomIndex = Math.floor(Math.random() * similarExercises.length);
+        setupState.selectedAccessories[index] = similarExercises[randomIndex];
+        updateSelectedAccessories();
     }
+}
+
+function getSimilarExercisePool(exercise) {
+    const exerciseName = exercise.exercise.toLowerCase();
+    if (exerciseName.includes('squat') || exerciseName.includes('leg')) return 'legs';
+    if (exerciseName.includes('bench') || exerciseName.includes('press')) return 'push';
+    if (exerciseName.includes('row') || exerciseName.includes('pull')) return 'pull';
+    return 'legs';
 }
 
 // -------------------------
@@ -162,27 +201,59 @@ function setupEventListeners() {
 }
 
 function startWorkout() {
-    // Save selected accessories to workout state
-    const workoutType = getLiftOfTheDay();
-    const recommended = ACCESSORIES[workoutType] || [];
-    const optional = ACCESSORY_POOLS[setupState.currentPool] || [];
+    // Save selected accessories and date to localStorage
+    const workoutSetup = {
+        selectedDate: state.program.todayDate,
+        selectedAccessories: setupState.selectedAccessories,
+        ...state.workout // Preserve any existing workout state (timer, etc)
+    };
     
-    state.workout.accessories = [
-        ...Array.from(setupState.selectedAccessories)
-            .filter(id => id.startsWith('recommended-'))
-            .map(id => recommended[parseInt(id.split('-')[1])]),
-        ...Array.from(setupState.selectedAccessories)
-            .filter(id => id.startsWith('optional-'))
-            .map(id => optional[parseInt(id.split('-')[1])])
-    ];
-    
-    loadView('workout');
+    localStorage.setItem('workoutSetup', JSON.stringify(workoutSetup));
+    window.location.href = '../workout/workout.html';
 }
 
 // Update the back button handler
 function handleBack() {
-    window.location.href = '../index.html';
+    localStorage.removeItem('workoutSetup');
+    window.location.href = '../calendar/calendar.html';
 }
 
 // Initialize page
-document.addEventListener('DOMContentLoaded', initializeSetupPage); 
+document.addEventListener('DOMContentLoaded', () => {
+    // First check for calendar selected date
+    const selectedDate = localStorage.getItem('selectedWorkoutDate');
+    if (selectedDate) {
+        state.program.todayDate = new Date(selectedDate);
+        localStorage.removeItem('selectedWorkoutDate');
+    }
+    
+    // Then check for workout setup (this will override calendar date if coming back from workout)
+    const workoutSetup = JSON.parse(localStorage.getItem('workoutSetup') || '{}');
+    
+    if (workoutSetup.selectedDate) {
+        state.program.todayDate = new Date(workoutSetup.selectedDate);
+    }
+    
+    if (workoutSetup.selectedAccessories) {
+        setupState.selectedAccessories = workoutSetup.selectedAccessories;
+    }
+    
+    // Preserve workout state if exists
+    if (workoutSetup.startTime) {
+        state.workout = {
+            startTime: workoutSetup.startTime,
+            timerPaused: workoutSetup.timerPaused,
+            pausedTime: workoutSetup.pausedTime,
+            totalPausedTime: workoutSetup.totalPausedTime
+        };
+    }
+    
+    initializeSetupPage();
+});
+
+function resetToDefault() {
+    const workoutType = getLiftOfTheDay();
+    const recommended = ACCESSORIES[workoutType] || [];
+    setupState.selectedAccessories = [...recommended];
+    updateSelectedAccessories();
+} 

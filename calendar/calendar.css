@@ -1,11 +1,135 @@
-/* Calendar specific styles can go here if needed */
-/* Most styles are already in shared/styles.css */
-
-/* Add any overrides or specific styles */
+/* Calendar specific styles */
 .app-header {
     justify-content: space-between;
 }
 
 .program-start {
     margin-right: auto;
+}
+
+/* Calendar View Layout */
+.calendar-view {
+    display: flex;
+    flex-direction: column;
+    gap: 0.75rem;
+    padding: 0.75rem;
+    height: calc(100vh - var(--header-height));
+    box-sizing: border-box;
+}
+
+/* Component Container */
+.component-container {
+    background: var(--background-light);
+    border: 1px solid var(--border-color);
+    border-radius: var(--border-radius);
+    padding: 0.75rem;
+}
+
+/* Status Legend */
+.status-legend {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 0.5rem;
+    font-size: 0.75rem;
+}
+
+/* Weekly Schedule */
+.weekly-schedule {
+    display: flex;
+    justify-content: space-between;
+    gap: 0.25rem;
+}
+
+/* Date Selector */
+.date-selector {
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.date-display {
+    flex: 1;
+    text-align: center;
+}
+
+.selected-date {
+    font-size: 1rem;
+    margin: 0;
+}
+
+.workout-type {
+    font-size: 0.875rem;
+    color: var(--text-muted);
+}
+
+/* Simple Calendar */
+.simple-calendar {
+    display: grid;
+    grid-template-columns: repeat(7, 1fr);
+    gap: 0.25rem;
+    width: 100%;
+    aspect-ratio: 7/5;
+    max-width: none;
+}
+
+.calendar-day {
+    aspect-ratio: 1;
+    font-size: 0.75rem;
+    min-width: 0;
+    padding: 0;
+}
+
+/* Workout Overview */
+.workout-overview {
+    display: flex;
+    flex-direction: column;
+    gap: 0.5rem;
+}
+
+.lift-details {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 0.5rem;
+    font-size: 0.875rem;
+}
+
+/* Program Over Message */
+.program-over {
+    text-align: center;
+    color: var(--text-muted);
+    padding: 0.5rem;
+    font-style: italic;
+}
+
+/* Mobile Optimizations */
+@media (max-width: 640px) {
+    .calendar-view {
+        gap: 0.5rem;
+        padding: 0.5rem;
+    }
+
+    .component-container {
+        padding: 0.5rem;
+    }
+
+    .status-legend {
+        font-size: 0.625rem;
+    }
+
+    .selected-date {
+        font-size: 0.875rem;
+    }
+
+    .workout-type {
+        font-size: 0.75rem;
+    }
+
+    .calendar-day {
+        font-size: 0.675rem;
+    }
+
+    .lift-details {
+        font-size: 0.75rem;
+    }
 } 

@@ -11,14 +11,12 @@
 </head>
 <body>
     <header class="app-header">
+        <button type="button" class="home-btn" onclick="window.location.href='../index.html'" aria-label="Go to home page">
+            🏠
+        </button>
         <div class="program-start">
-            <label for="program-start">Program Start:</label>
-            <input 
-                type="date" 
-                id="program-start" 
-                name="program-start"
-                onchange="updateProgramStart(this.value)"
-            >
+            <label>Program Start:</label>
+            <span id="program-start-display"></span>
         </div>
         <div class="theme-switch">
             <label class="switch" for="theme-toggle">
@@ -31,102 +29,114 @@
     <main class="main-container" role="main" id="main-content">
         <section id="calendar-view" class="view active">
             <!-- Status Legend -->
-            <div class="status-legend">
-                <div class="legend-item">
-                    <span class="color-dot complete"></span>
-                    <span>Complete</span>
-                </div>
-                <div class="legend-item">
-                    <span class="color-dot partial"></span>
-                    <span>Partial</span>
-                </div>
-                <div class="legend-item">
-                    <span class="color-dot upcoming"></span>
-                    <span>Not Started</span>
-                </div>
-                <div class="legend-item">
-                    <span class="color-dot missed"></span>
-                    <span>Missed</span>
-                </div>
-                <div class="legend-item">
-                    <span class="color-dot rest"></span>
-                    <span>Rest Day</span>
+            <div class="component-container">
+                <div class="status-legend">
+                    <div class="legend-item">
+                        <span class="color-dot complete"></span>
+                        <span>Complete</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="color-dot partial"></span>
+                        <span>Partial</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="color-dot upcoming"></span>
+                        <span>Not Started</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="color-dot missed"></span>
+                        <span>Missed</span>
+                    </div>
+                    <div class="legend-item">
+                        <span class="color-dot rest"></span>
+                        <span>Rest Day</span>
+                    </div>
                 </div>
             </div>
 
             <!-- Weekly Schedule -->
-            <div class="weekly-schedule">
-                <div class="schedule-day">
-                    <span class="day-label">Mon</span>
-                    <span class="day-lift">
-                        <span class="lift-type">Heavy</span>
-                        <span class="lift-name">Squat</span>
-                    </span>
-                </div>
-                <div class="schedule-day">
-                    <span class="day-label">Tue</span>
-                    <span class="day-lift">
-                        <span class="lift-type">Light</span>
-                        <span class="lift-name">Bench</span>
-                    </span>
-                </div>
-                <div class="schedule-day">
-                    <span class="day-label">Wed</span>
-                    <span class="day-lift">
-                        <span class="lift-name">Dead</span>
-                    </span>
-                </div>
-                <div class="schedule-day">
-                    <span class="day-label">Thu</span>
-                    <span class="day-lift">
-                        <span class="lift-type">Light</span>
-                        <span class="lift-name">Squat</span>
-                    </span>
-                </div>
-                <div class="schedule-day">
-                    <span class="day-label">Fri</span>
-                    <span class="day-lift">
-                        <span class="lift-type">Heavy</span>
-                        <span class="lift-name">Bench</span>
-                    </span>
+            <div class="component-container">
+                <div class="weekly-schedule">
+                    <div class="schedule-day">
+                        <span class="day-label">Mon</span>
+                        <span class="day-lift">
+                            <span class="lift-type">Heavy</span>
+                            <span class="lift-name">Squat</span>
+                        </span>
+                    </div>
+                    <div class="schedule-day">
+                        <span class="day-label">Tue</span>
+                        <span class="day-lift">
+                            <span class="lift-type">Light</span>
+                            <span class="lift-name">Bench</span>
+                        </span>
+                    </div>
+                    <div class="schedule-day">
+                        <span class="day-label">Wed</span>
+                        <span class="day-lift">
+                            <span class="lift-name">Dead</span>
+                        </span>
+                    </div>
+                    <div class="schedule-day">
+                        <span class="day-label">Thu</span>
+                        <span class="day-lift">
+                            <span class="lift-type">Light</span>
+                            <span class="lift-name">Squat</span>
+                        </span>
+                    </div>
+                    <div class="schedule-day">
+                        <span class="day-label">Fri</span>
+                        <span class="day-lift">
+                            <span class="lift-type">Heavy</span>
+                            <span class="lift-name">Bench</span>
+                        </span>
+                    </div>
                 </div>
             </div>
 
             <!-- Date Selector -->
-            <div class="date-selector">
-                <button type="button" class="nav-btn" onclick="previousDay()">&lt;</button>
-                <div class="date-display">
-                    <h2 class="selected-date">September 25, 2024</h2>
-                    <div class="workout-type">Heavy Squat</div>
+            <div class="component-container">
+                <div class="date-selector">
+                    <button type="button" class="nav-btn" onclick="previousDay()">&lt;</button>
+                    <div class="date-display">
+                        <h2 class="selected-date">September 25, 2024</h2>
+                        <div class="workout-type">Heavy Squat</div>
+                    </div>
+                    <button type="button" class="nav-btn" onclick="nextDay()">&gt;</button>
                 </div>
-                <button type="button" class="nav-btn" onclick="nextDay()">&gt;</button>
             </div>
 
             <!-- Simple Calendar -->
-            <div class="simple-calendar">
-                <!-- Will be populated by JavaScript -->
+            <div class="component-container">
+                <div class="simple-calendar">
+                    <!-- Will be populated by JavaScript -->
+                </div>
             </div>
 
             <!-- Workout Status -->
-            <div class="workout-status">
-                <div class="status-indicator">
-                    <span class="status-dot"></span>
-                    <span class="status-text">Not Started</span>
+            <div class="component-container">
+                <div class="workout-status">
+                    <div class="status-indicator">
+                        <span class="status-dot"></span>
+                        <span class="status-text">Not Started</span>
+                    </div>
                 </div>
             </div>
 
             <!-- Workout Overview Section -->
-            <div id="workout-overview" class="workout-overview">
-                <div class="overview-content">
-                    <div class="lift-details">
-                        <span class="lift-name">Heavy Squat</span>
-                        <span class="lift-weight">225 lbs</span>
-                        <span class="lift-sets">5x5</span>
+            <div class="component-container">
+                <div id="workout-overview" class="workout-overview">
+                    <div class="overview-content">
+                        <div class="lift-details">
+                            <span class="lift-name">Heavy Squat</span>
+                            <span class="lift-weight">225 lbs</span>
+                            <span class="lift-sets">5x5</span>
+                        </div>
                     </div>
+                    <button type="button" class="setup-btn">
+                        Setup Workout
+                    </button>
                 </div>
-                <button type="button" class="setup-btn" onclick="loadView('setup')">
-                    Setup Workout
-                </button>
             </div>
         </section>
     </main>

@@ -28,12 +28,12 @@
     --text-muted: #64748b;
     --neutral: #94a3b8;
     --neutral-light: #f1f5f9;
-    --dot-rest: #94a3b8;        /* Gray for rest/out of program */
-    --dot-upcoming: #ffffff;     /* White for not started */
-    --dot-complete: #22c55e;     /* Bright green for complete */
-    --dot-partial: #86efac;      /* Light green for partial */
-    --dot-missed: #fecaca;       /* Light red for missed */
-    --dot-border: #e2e8f0;       /* Border color for white dots */
+    --dot-rest: #64748b;        /* Dark gray for rest days */
+    --dot-upcoming: #e2e8f0;    /* Light gray for not started */
+    --dot-complete: #22c55e;    /* Green for complete */
+    --dot-partial: #86efac;     /* Light green for partial */
+    --dot-missed: #fecaca;      /* Light red for missed */
+    --dot-border: #e2e8f0;      /* Border color for dots */
 }
 
 [data-theme="dark"] {
@@ -57,12 +57,12 @@
     --text-muted: #94a3b8;
     --neutral: #64748b;
     --neutral-light: #1e293b;
-    --dot-rest: #475569;
-    --dot-upcoming: #1e293b;
-    --dot-complete: #22c55e;
-    --dot-partial: #166534;
-    --dot-missed: #7f1d1d;
-    --dot-border: #334155;
+    --dot-rest: #475569;        /* Darker gray for rest days */
+    --dot-upcoming: #334155;    /* Dark gray for not started */
+    --dot-complete: #22c55e;    /* Keep same green */
+    --dot-partial: #4ade80;     /* Adjusted light green for visibility */
+    --dot-missed: #fca5a5;      /* Adjusted light red for visibility */
+    --dot-border: #334155;      /* Border color for dots */
 }
 
 /* -----------------------------
@@ -98,10 +98,10 @@ main {
     padding: 0.5rem 1rem;
     border-bottom: 1px solid var(--border-color);
     display: flex;
-    justify-content: flex-end;
     align-items: center;
+    gap: 1rem;
     backdrop-filter: blur(8px);
-    height: 3rem;
+    height: var(--header-height);
     box-sizing: border-box;
 }
 
@@ -157,14 +157,14 @@ main {
 /* Add these theme switch styles */
 .theme-switch {
     position: relative;
-    display: inline-block;
+    margin-left: auto;
 }
 
 .switch {
     position: relative;
     display: inline-block;
-    width: 40px;
-    height: 20px;
+    width: 60px;
+    height: 30px;
 }
 
 .switch input {
@@ -180,26 +180,53 @@ main {
     left: 0;
     right: 0;
     bottom: 0;
-    background: var(--background-light);
+    background-color: var(--background-muted);
     border: 1px solid var(--border-color);
-    border-radius: 20px;
-    transition: var(--transition-speed);
+    transition: .4s;
+    border-radius: 34px;
 }
 
 .slider:before {
-    content: "";
     position: absolute;
-    height: 16px;
-    width: 16px;
-    left: 2px;
-    bottom: 1px;
-    background: var(--primary-color);
+    content: "☀️";
+    height: 22px;
+    width: 22px;
+    left: 4px;
+    bottom: 3px;
+    background-color: var(--background);
+    border: 1px solid var(--border-color);
+    transition: .4s;
     border-radius: 50%;
-    transition: var(--transition-speed);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 14px;
+}
+
+/* Dark mode styles */
+[data-theme="dark"] .slider {
+    background-color: var(--background);
+}
+
+[data-theme="dark"] .slider:before {
+    background-color: var(--background-light);
+}
+
+/* Dark mode icon */
+input:checked + .slider:before {
+    content: "🌙";
+}
+
+input:checked + .slider {
+    background-color: var(--primary-color);
+}
+
+input:focus + .slider {
+    box-shadow: 0 0 1px var(--primary-color);
 }
 
 input:checked + .slider:before {
-    transform: translateX(20px);
+    transform: translateX(30px);
 }
 
 /* -----------------------------
@@ -774,4 +801,145 @@ input:checked + .slider:before {
 /* Adjust main container to account for header */
 .main-container {
     padding-top: 3rem;
+} 
+
+/* Update the color dot styles */
+.color-dot.complete { 
+    background: var(--dot-complete); 
+}
+.color-dot.partial { 
+    background: var(--dot-partial); 
+}
+.color-dot.upcoming { 
+    background: var(--dot-upcoming);
+    border: 1px solid var(--dot-border); 
+}
+.color-dot.missed { 
+    background: var(--dot-missed); 
+}
+.color-dot.rest { 
+    background: var(--dot-rest); 
+} 
+
+/* Layout and Spacing */
+.main-container {
+    max-width: 800px;
+    margin: 0 auto;
+    padding: calc(var(--header-height) + 1rem) 1rem 2rem;
+}
+
+/* Calendar View Layout */
+.calendar-view {
+    display: flex;
+    flex-direction: column;
+    gap: 1.5rem;
+    padding: 0.5rem;
+}
+
+/* Status Legend */
+.status-legend {
+    display: flex;
+    justify-content: center;
+    flex-wrap: wrap;
+    gap: 1rem;
+    padding: 1rem;
+    margin: 0 -0.5rem;
+    background: var(--background-light);
+    border-radius: var(--border-radius);
+}
+
+/* Weekly Schedule */
+.weekly-schedule {
+    display: flex;
+    justify-content: space-between;
+    padding: 1rem;
+    margin: 0 -0.5rem;
+    background: var(--background-light);
+    border-radius: var(--border-radius);
+    overflow-x: auto;
+}
+
+/* Date Selector */
+.date-selector {
+    padding: 1rem;
+    margin: 0 -0.5rem;
+    background: var(--background-light);
+    border-radius: var(--border-radius);
+}
+
+/* Simple Calendar */
+.simple-calendar {
+    padding: 1rem;
+    margin: 0 -0.5rem;
+    background: var(--background-light);
+    border-radius: var(--border-radius);
+}
+
+/* Workout Overview */
+.workout-overview {
+    padding: 1.5rem;
+    margin: 0 -0.5rem;
+    background: var(--background-light);
+    border-radius: var(--border-radius);
+}
+
+/* Responsive adjustments */
+@media (max-width: 640px) {
+    .main-container {
+        padding: calc(var(--header-height) + 0.5rem) 0.75rem 1rem;
+    }
+    
+    .calendar-view {
+        gap: 1rem;
+        padding: 0.25rem;
+    }
+    
+    .status-legend,
+    .weekly-schedule,
+    .date-selector,
+    .simple-calendar,
+    .workout-overview {
+        padding: 0.75rem;
+        margin: 0 -0.25rem;
+    }
+    
+    .workout-overview {
+        padding: 1rem;
+    }
+}
+
+/* Add proper spacing for lift details */
+.lift-details {
+    display: grid;
+    grid-template-columns: repeat(3, 1fr);
+    gap: 1rem;
+    padding: 1.5rem;
+    background: var(--background);
+    border-radius: var(--border-radius);
+    margin-bottom: 1rem;
+}
+
+@media (max-width: 640px) {
+    .lift-details {
+        padding: 1rem;
+        gap: 0.75rem;
+    }
+} 
+
+/* Add to Header Styles section */
+.home-btn {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    padding: 0.5rem;
+    color: var(--text-muted);
+    cursor: pointer;
+    transition: color 0.2s ease;
+    background: none;
+    border: none;
+    font-size: 1.25rem;
+}
+
+.home-btn:hover {
+    color: var(--primary-color);
 } 

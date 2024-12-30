@@ -86,31 +86,26 @@ function initializeSetupPage() {
             state.program.todayDate = new Date(workoutSetup.selectedDate);
         }
         
-        // Initialize workout state with any existing progress
-        if (workoutSetup.startTime) {
-            state.workout = {
-                ...state.workout,
-                startTime: new Date(workoutSetup.startTime),
-                timerPaused: workoutSetup.timerPaused,
-                totalPausedTime: workoutSetup.totalPausedTime || 0
-            };
-        }
-        
         updateHeaderInfo();
         
         // Load saved workout state if it exists
         const dateKey = getFormattedDate(state.program.todayDate);
         const savedWorkout = state.savedWorkouts.get(dateKey);
         
-        if (savedWorkout?.setup || workoutSetup.selectedAccessories?.length > 0) {
-            // Use existing accessories if available
-            setupState.selectedAccessories = workoutSetup.selectedAccessories || 
-                savedWorkout?.setup?.selectedAccessories || [];
+        // Handle accessories in this order:
+        // 1. Current workout setup accessories
+        // 2. Saved workout accessories
+        // 3. Default recommended accessories
+        if (workoutSetup.selectedAccessories?.length > 0) {
+            setupState.selectedAccessories = workoutSetup.selectedAccessories;
+        } else if (savedWorkout?.setup?.selectedAccessories?.length > 0) {
+            setupState.selectedAccessories = savedWorkout.setup.selectedAccessories;
         } else {
-            // Load recommended accessories for new workouts
             loadRecommendedAccessories();
         }
         
+        // Update UI
+        updateSelectedAccessories();
         loadOptionalAccessories();
         setupEventListeners();
     } catch (error) {
